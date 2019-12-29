@@ -150,6 +150,11 @@
 					"default": "xex",
 					"desription": "What extension to put on the file, e.g .d, .xex. Use 'target' to make the extension be the same as cl65.target"
 				},
+				"cc65.buildoutput": {
+					"type": "string",
+					"default": "build",
+					"description": "Where to place the output file"
+				},
 				"cc65.buildenv": {
 					"type": "string",
 					"default": "windows",

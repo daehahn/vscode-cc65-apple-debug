@@ -104,6 +104,10 @@ function getCC65Extension(outChannel?: vscode.OutputChannel) : string {
     return getOneConfig('cl65.extension', "xex", outChannel || undefined);
 }
 
+function getCC65BuildOutput(outChannel?: vscode.OutputChannel) : string {
+    return getOneConfig('cc65.buildoutput', "build", outChannel || undefined);
+}
+
 function getCC65BuildEnv(outChannel?: vscode.OutputChannel) : string {
     return getOneConfig('cc65.buildenv', "windows", outChannel || undefined);
 }
@@ -139,6 +143,7 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     getCC65Options(outChannel);
     getCC65Target(outChannel);
     getCC65Extension(outChannel);
+    getCC65BuildOutput(outChannel);
     getCC65BuildEnv(outChannel);
     getCC65VSCodeEnv(outChannel);
     getCC65TestEnv(outChannel);
@@ -167,6 +172,7 @@ function buildProgramCL65() {
     let targetExtension: string = getCC65Extension();
     let buildenv: string = getCC65BuildEnv();
     let vscodeenv: string = getCC65VSCodeEnv();
+    let buildDir: string = getCC65BuildOutput();
 
     if (targetExtension === "target") {
         targetExtension = target;
@@ -334,6 +340,8 @@ function buildProgramCL65() {
             }
 
             var allObjectFiles = objectFiles.join(' ');
+
+            // to consider - adding an output/build dir
 
             outputChannel.append('' + config);
             fs.appendFileSync(filename,

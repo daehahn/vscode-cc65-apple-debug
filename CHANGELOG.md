@@ -12,3 +12,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - TODO: implement support for launching emulator
 - TODO: implement support for make file usage
 - TODO: implement run behavior
+- TODO: add build directory for output
