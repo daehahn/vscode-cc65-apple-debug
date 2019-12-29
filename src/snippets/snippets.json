@@ -1,0 +1,131 @@
+{
+    "!proc": {
+        "prefix": ".proc",
+        "body": [
+            ".proc PROC_NAME",
+            "\t\trts",
+            ".endproc"
+        ],
+        "description": "Procedure scope definition"
+    },
+    "!scope": {
+        "prefix": ".scope",
+        "body": [
+            ".scope",
+            "\t\trts",
+            ".endscope"
+        ],
+        "description": "Scope definition"
+    },
+    "!if": {
+        "prefix": ".if",
+        "body": [
+            ".if CONDITION",
+            "\t\trts",
+            ".endif"
+        ],
+        "description": "If condition definition"
+    },
+    "!ifel": {
+        "prefix": ".if",
+        "body": [
+            ".if CONDITION",
+            "\t\trts",
+            ".else",
+            "\t\trts",
+            ".endif"
+        ],
+        "description": "Procedure scope definition"
+    },
+    "!struct": {
+        "prefix": ".struct",
+        "body": [
+            ".struct STRUCT_NAME",
+            "\t\tlabel1\t.word",
+            "\t\tlabel2\t.byte",
+            ".endstruct"
+        ],
+        "description": "Struct definition"
+    },
+    "!union": {
+        "prefix": ".union",
+        "body": [
+            ".union UNION_NAME",
+            "\t\tlabel1\t.word",
+            "\t\tlabel2\t.byte",
+            ".endunion"
+        ],
+        "description": "Union definition"
+    },
+    "!enum": {
+        "prefix": ".enum",
+        "body": [
+            ".enum ENUM_NAME",
+            "\t\tvalue1",
+            "\t\tvalue2",
+            ".endenum"
+        ],
+        "description": "Enum definition"
+    },
+    "!macro": {
+        "prefix": ".macro",
+        "body": [
+            ".macro MACRO_NAME",
+            "\t\tclc",
+            "\t\tadc foo",
+            ".endmacro"
+        ],
+        "description": "Macro definition"
+    },
+    "!repeat": {
+        "prefix": ".repeat",
+        "body": [
+            ".repeat CONDITION",
+            "\t\t.byte\t.strat(Arg, I) ^ $55",
+            ".endrepeat"
+        ],
+        "description": "Repeat definition"
+    },
+    "!jumptable": {
+        "prefix": "jumptable",
+        "body": [
+            "; Jumptable start",            
+            "label1:\tjmp\tTARGET1",
+            "label2:\tjmp\tTARGET2",
+            "; Jumptable end"
+        ],
+        "description": "Create a jump table"
+    },
+    "!preserve": {
+        "prefix": "preserve",
+        "body": [
+            "\t\tphp",
+            "\t\tpha",
+            "\t\ttxa",
+            "\t\tpha",
+            "\t\ttya",
+            "\t\tpha",
+            "",
+            "\t\t\t; Your code here",
+            "",
+            "\t\tpla",
+            "\t\ttay",
+            "\t\tpla",
+            "\t\ttax",
+            "\t\tpla",
+            "\t\tplp",
+            "\t\trts"
+        ],
+        "description": "Preserves process or registers"
+    },
+    "!pointer": {
+        "prefix": "pointer",
+        "body": [
+            "\t\tlda\t#<TARGET",
+            "\t\tsta\tPOINTER",
+            "\t\tlda\t#>TARGET",
+            "\t\tsta\tPOINTER + 1"
+        ],
+        "description": "Assigns a value to a pointer"
+    }
+}

@@ -1,0 +1,232 @@
+{
+	"name": "cc65-redux",
+	"displayName": "cc65-redux",
+	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
+	"version": "0.0.1",
+	"publisher": "rumination-studios",
+	"markdown": "github",
+	"engines": {
+		"vscode": "^1.41.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"cc65",
+		"ca65",
+		"6502",
+		"65816",
+		"assembly"
+	],
+	"icon": "images/cc65-redux-icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/"
+	},
+	"main": "./out/extension.js",
+	"contributes": {
+		"keybindings": [
+			{
+				"command": "cc65.build",
+				"key": "ctrl-b",
+				"mac": "cmd-b",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "cc65.build_run",
+				"key": "ctrl-e",
+				"mac": "cmd-e",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "cc65.make.build",
+				"key": "ctrl-m",
+				"mac": "cmd-m",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "cc65.make.build_run",
+				"key": "ctrl-t",
+				"mac": "cmd-t",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "cc65.run",
+				"key": "ctrl-shift-r",
+				"mac": "cmd-shift-r",
+				"when": "editorTextFocus"
+			}
+		],
+		"languages": [
+			{
+				"id": "cc65",
+				"aliases": [
+					"cc65 Assembler",
+					"ca65"
+				],
+				"extensions": [
+					".s",
+					".asm",
+					".inc"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "cc65",
+				"scopeName": "source.cc65",
+				"path": "./src/syntaxes/cc65.tmLanguage.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "cc65.test",
+				"title": "CC65: Test"
+			},
+			{
+				"command": "cc65.build",
+				"title": "CC65: Build Directly"
+			},
+			{
+				"command": "cc65.make.build",
+				"title": "CC65: Build with Make"
+			},
+			{
+				"command": "cc65.make.build_run",
+				"title": "CC65: Build with Make & Run Emulator"
+			},
+			{
+				"command": "cc65.build_run",
+				"title": "CC65: Build Directly & Run Emulator"
+			},
+			{
+				"command": "cc65.run",
+				"title": "CC65: Run Emulator"
+			}
+		],
+		"snippets": [
+			{
+				"language": "cc65",
+				"path": "./src/snippets/snippets.json"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "CC65 configuration",
+			"properties": {
+				"cc65.cc65": {
+					"type": "string",
+					"default": "C:\\cc65\\bin",
+					"description": "Path to cc65 binary files.",
+					"required": true
+				},
+				"cc65.cl65.config": {
+					"type": "string",
+					"default": "C:\\cc65\\cfg\\atarixl.cfg",
+					"desription": "Config file to use for LD65, such as 'src/vic20-32k.cfg'"
+				},
+				"cc65.cl65.options": {
+					"type": "string",
+					"default": "",
+					"description": "Linker options"
+				},
+				"cc65.cc65.options": {
+					"type": "string",
+					"default": "-Oi",
+					"description": "cc65 C compiler options"
+				},
+				"cc65.cl65.target": {
+					"type": "string",
+					"default": "atarixl",
+					"description": "Target system for LD65 to link against.",
+					"required": true
+				},
+				"cc65.cl65.extension": {
+					"type": "string",
+					"default": "xex",
+					"desription": "What extension to put on the file, e.g .d, .xex. Use 'target' to make the extension be the same as cl65.target"
+				},
+				"cc65.buildenv": {
+					"type": "string",
+					"default": "windows",
+					"description": "Operating system to build with.",
+					"required": true
+				},
+				"cc65.vscodeenv": {
+					"type": "string",
+					"default": "windows",
+					"description": "Operating system that VSCode runs in.",
+					"required": true
+				},
+				"cc65.testenv": {
+					"type": "string",
+					"default": "windows",
+					"description": "Operating system to test with.",
+					"required": true
+				},
+				"cc65.emulatorPrelaunch": {
+					"type": "string",
+					"default": "",
+					"description": "Optional command to execute before launching emulator."
+				},
+				"cc65.emulatorPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to the emulator."
+				},
+				"cc65.emulatorOptions": {
+					"type": "string",
+					"default": "",
+					"description": "Command line options to pass to the emulator."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.41.0",
+		"glob": "^7.1.5",
+		"mocha": "^6.2.2",
+		"typescript": "^3.6.4",
+		"tslint": "^5.20.0",
+		"vscode-test": "^1.2.2"
+	},
+	"activationEvents": [
+		"CHANGE_TO_JUST_ASTERISK_TO_DEBUG_*",
+		"workspaceContains:src/**/*.s",
+		"workspaceContains:src/**/*.asm",
+		"workspaceContains:src/**/*.inc",
+		"onLanguage:cc65",
+		"onCommand:cc65.test",
+		"onCommand:cc65.build",
+		"onCommand:cc65.make.build",
+		"onCommand:cc65.build_run",
+		"onCommand:cc65.make.build_rn",
+		"onCommand:cc65.run"
+	],
+	"extensionDependencies": [
+		"austin.code-gnu-global",
+		"christian-kohler.npm-intellisense",
+		"DavidAnson.vscode-markdownlint",
+		"dbaeumer.vscode-eslint",
+		"eg2.vscode-npm-script",
+		"formulahendry.auto-close-tag",
+		"formulahendry.auto-rename-tag",
+		"KnisterPeter.vscode-github",
+		"ms-vscode.cpptools",
+		"ms-vscode.csharp",
+		"ms-vscode.PowerShell",
+		"ms-vscode.Theme-MarkdownKit",
+		"rogalmic.bash-debug"
+	]
+}
