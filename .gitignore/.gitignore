@@ -1,0 +1,5 @@
+# basic ignore file
+out
+node_modules
+.vscode/
+*.vsix
