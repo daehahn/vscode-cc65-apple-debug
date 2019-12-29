@@ -37,7 +37,7 @@ You will need to set any options for cl65, for example:
 
 ```json
 {
-    "cc65.cl65.config": "c:\\cc65\\cfg\atarixl.cfg"
+    "cc65.cl65.config": "c:\\cc65\\cfg\\atarixl.cfg"
 }
 ```
 
@@ -47,7 +47,7 @@ You will need to set the machine target to build with, for example:
 
 ```json
 {
-    "cc65.cl65.target": "vic20",
+    "cc65.cl65.target": "atarixl",
 }
 ```
 
@@ -62,14 +62,15 @@ TODO: Add
 }
 ```
 
+These can be windows, linux, or mac
 You MUST set your environment options, for example:
 Only "windows" works for now
 
 ```json
 {
-    "cc65.buildenv": "windows", // May be windows, linux or mac
-    "cc65.vscodeenv": "windows", // May be windows, linux, or mac
-    "cc65.testenv": "windows"  // May be windows, linux, or mac
+    "cc65.buildenv": "windows",
+    "cc65.vscodeenv": "windows",
+    "cc65.testenv": "windows"
 }
 ```
 
