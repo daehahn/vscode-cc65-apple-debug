@@ -85,7 +85,7 @@ function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.Outpu
 }
 
 function getCC65Path(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65', "C:\\cc65\\bin", outChannel || undefined);
+    return getOneConfig('cc65.compilerToolsPath', "C:\\cc65\\bin", outChannel || undefined);
 }
 
 function getCC65Config(outChannel?: vscode.OutputChannel) : string {
@@ -105,31 +105,31 @@ function getCC65Extension(outChannel?: vscode.OutputChannel) : string {
 }
 
 function getCC65BuildOutput(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.buildoutput', "build", outChannel || undefined);
+    return getOneConfig('cc65.env.buildOutput', "build", outChannel || undefined);
 }
 
 function getCC65BuildEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.buildenv', "windows", outChannel || undefined);
+    return getOneConfig('cc65.env.build', "windows", outChannel || undefined);
 }
 
 function getCC65VSCodeEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.vscodeenv', "windows", outChannel || undefined);
+    return getOneConfig('cc65.env.vscode', "windows", outChannel || undefined);
 }
 
 function getCC65TestEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.testenv', "windows", outChannel || undefined);
+    return getOneConfig('cc65.env.test', "windows", outChannel || undefined);
 }
 
 function getCC65EmulatorPrelaunch(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('emulatorPrelaunch', "", outChannel || undefined);
+    return getOneConfig('cc65.emulator.prelaunch', "", outChannel || undefined);
 }
 
 function getCC65EmulatorPath(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('emulatorPath', "", outChannel || undefined);
+    return getOneConfig('cc65.emulator.path', "", outChannel || undefined);
 }
 
 function getCC65EmulatorOptions(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('emulatorOptions', "", outChannel || undefined);
+    return getOneConfig('cc65.emulator.options', "", outChannel || undefined);
 }
 
 function dumpConfig(outChannel: vscode.OutputChannel) {

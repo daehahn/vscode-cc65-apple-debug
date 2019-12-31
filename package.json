@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -116,9 +116,9 @@
 		],
 		"configuration": {
 			"type": "object",
-			"title": "CC65 configuration",
+			"title": "cc65-redux",
 			"properties": {
-				"cc65.cc65": {
+				"cc65.cc65.compilerToolsPath": {
 					"type": "string",
 					"default": "C:\\cc65\\bin",
 					"description": "Path to cc65 binary files.",
@@ -142,6 +142,58 @@
 				"cc65.cl65.target": {
 					"type": "string",
 					"default": "atarixl",
+					"enum": [
+						"none",
+						"apple2",
+						"apple2enh",
+						"atari",
+						"atarixl",
+						"atmos",
+						"c16",
+						"c64",
+						"c128",
+						"cbm510",
+						"cbm610",
+						"geos-apple",
+						"geos-cbm",
+						"lunix",
+						"lynx",
+						"nes",
+						"osic1p",
+						"pet",
+						"plus4",
+						"sim6502",
+						"sim65c02",
+						"supervision",
+						"telestrat",
+						"vic20"
+					],
+					"enumDescriptions": [
+						"none",
+						"Apple ][",
+						"Apple //e",
+						"Atari ",
+						"Atari XL",
+						"Oric Atmos",
+						"Commodore 16/116 (works also for the c116 with memory up to 32K)",
+						"Commodore 64",
+						"Commodore 128",
+						"Commodore 510 (CBM-II series with 40 column video)",
+						"Commodore 610 (all CBM-II II computers with 80 column video)",
+						"geos-apple",
+						"geos-cbm",
+						"lunix",
+						"Atari Lynx",
+						"Nintendo Entertainment System",
+						"Ohio Scientific Machines",
+						"Commodore PET (all CBM PET systems except the 2001)",
+						"Commodore Plus/4",
+						"Simulator for 6502",
+						"Simulator for 65C02",
+						"Watara Supervision Console",
+						"Oric Telestrat",
+						"Commodore VIC20"
+					],
 					"description": "Target system for LD65 to link against.",
 					"required": true
 				},
@@ -150,40 +202,40 @@
 					"default": "xex",
 					"desription": "What extension to put on the file, e.g .d, .xex. Use 'target' to make the extension be the same as cl65.target"
 				},
-				"cc65.buildoutput": {
+				"cc65.env.buildOutput": {
 					"type": "string",
 					"default": "build",
-					"description": "Where to place the output file"
+					"description": "Where to place the output binary file"
 				},
-				"cc65.buildenv": {
+				"cc65.env.build": {
 					"type": "string",
 					"default": "windows",
-					"description": "Operating system to build with.",
+					"description": "Operating System running the tools - may become redundant",
 					"required": true
 				},
-				"cc65.vscodeenv": {
+				"cc65.env.vscode": {
 					"type": "string",
 					"default": "windows",
-					"description": "Operating system that VSCode runs in.",
+					"description": "Operating System that VSCode is running on. Autodetect?",
 					"required": true
 				},
-				"cc65.testenv": {
+				"cc65.env.test": {
 					"type": "string",
 					"default": "windows",
-					"description": "Operating system to test with.",
+					"description": "Operating System to test with.",
 					"required": true
 				},
-				"cc65.emulatorPrelaunch": {
+				"cc65.emulator.prelaunch": {
 					"type": "string",
 					"default": "",
 					"description": "Optional command to execute before launching emulator."
 				},
-				"cc65.emulatorPath": {
+				"cc65.emulator.path": {
 					"type": "string",
 					"default": "",
 					"description": "Path to the emulator."
 				},
-				"cc65.emulatorOptions": {
+				"cc65.emulator.options": {
 					"type": "string",
 					"default": "",
 					"description": "Command line options to pass to the emulator."
@@ -210,7 +262,6 @@
 		"vscode-test": "^1.2.2"
 	},
 	"activationEvents": [
-		"CHANGE_TO_JUST_ASTERISK_TO_DEBUG_*",
 		"workspaceContains:src/**/*.s",
 		"workspaceContains:src/**/*.asm",
 		"workspaceContains:src/**/*.inc",
