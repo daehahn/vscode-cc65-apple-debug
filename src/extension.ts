@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as cp from 'child_process';
+import * as path from 'path';
 
 //function buildCommands(context: vscode.ExtensionContext): void;
 
@@ -53,11 +54,16 @@ function buildCommands(context: vscode.ExtensionContext): void {
         buildProgramMake();
 	});
 	
-	let commandRun = vscode.commands.registerCommand('cc65.run', function () {
-		// this should just run the emulator basically
+	let commandRun = vscode.commands.registerCommand('cc65.run.program', function () {
+		// this should run the program in the emulator
 		runProgram();
     });
     
+    let commandRunEmu = vscode.commands.registerCommand('cc65.run.emulator', function () {
+		// this should just launch the emulator
+		launchEmulator(false);
+    });
+
     let commandTest = vscode.commands.registerCommand('cc65.test', function () {
         // show something
         vscode.window.showInformationMessage('cc65 test command to activate from the command palette');
@@ -71,7 +77,7 @@ function buildCommands(context: vscode.ExtensionContext): void {
     context.subscriptions.push(commandTest);
 }
 
-function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.OutputChannel) {
+function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.OutputChannel): string {
     let wsConfig = vscode.workspace.getConfiguration('cc65');
     let v: string = wsConfig.get(key, defaultVal);
     if (outChannel) {
@@ -84,8 +90,21 @@ function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.Outpu
 	return v;
 }
 
+function getOneBooleanConfig(key: string, defaultVal: boolean, outChannel?: vscode.OutputChannel): boolean {
+    let wsConfig = vscode.workspace.getConfiguration('cc65');
+    let v: boolean = wsConfig.get(key, defaultVal);
+    if (outChannel) {
+        outChannel.append("\t");
+        outChannel.append(key);
+        outChannel.append(" = ");
+        outChannel.appendLine(v.toString());
+    }
+
+	return v;
+}
+
 function getCC65Path(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.compilerToolsPath', "C:\\cc65\\bin", outChannel || undefined);
+    return getOneConfig('compilerToolsPath', "C:\\cc65\\bin", outChannel || undefined);
 }
 
 function getCC65Config(outChannel?: vscode.OutputChannel) : string {
@@ -94,6 +113,10 @@ function getCC65Config(outChannel?: vscode.OutputChannel) : string {
 
 function getCC65Options(outChannel?: vscode.OutputChannel) : string {
     return getOneConfig('cc65.options', "", outChannel || undefined);
+}
+
+function getCC65CreateDebugInfo(outChannel?: vscode.OutputChannel) : boolean {
+    return getOneBooleanConfig('createDebugInfo', true, outChannel || undefined);
 }
 
 function getCC65Target(outChannel?: vscode.OutputChannel) : string {
@@ -105,31 +128,46 @@ function getCC65Extension(outChannel?: vscode.OutputChannel) : string {
 }
 
 function getCC65BuildOutput(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.env.buildOutput', "build", outChannel || undefined);
+    return getOneConfig('env.buildOutput', "build", outChannel || undefined);
 }
 
 function getCC65BuildEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.env.build', "windows", outChannel || undefined);
+    return getOneConfig('env.build', "windows", outChannel || undefined);
 }
 
 function getCC65VSCodeEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.env.vscode', "windows", outChannel || undefined);
+    return getOneConfig('env.vscode', "windows", outChannel || undefined);
 }
 
 function getCC65TestEnv(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.env.test', "windows", outChannel || undefined);
+    return getOneConfig('env.test', "windows", outChannel || undefined);
 }
 
 function getCC65EmulatorPrelaunch(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.emulator.prelaunch', "", outChannel || undefined);
+    return getOneConfig('emulator.prelaunch', "", outChannel || undefined);
 }
 
 function getCC65EmulatorPath(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.emulator.path', "", outChannel || undefined);
+    return getOneConfig('emulator.path', "", outChannel || undefined);
 }
 
 function getCC65EmulatorOptions(outChannel?: vscode.OutputChannel) : string {
-    return getOneConfig('cc65.emulator.options', "", outChannel || undefined);
+    return getOneConfig('emulator.options', "", outChannel || undefined);
+}
+
+function getCC65EmulatorQuickConfig(outChannel?: vscode.OutputChannel) : string {
+    return getOneConfig('emulator.quickConfig', "", outChannel || undefined);
+}
+
+function getProgramName() : string {
+	// will be based off of the workspace name
+	// what if we are not in a workspace?
+    var programName: string = vscode.workspace.name!;
+
+	let programNames: string[] = programName.split(" ");
+    programName = programNames[0];
+    
+    return programName;
 }
 
 function dumpConfig(outChannel: vscode.OutputChannel) {
@@ -141,6 +179,7 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     getCC65Path(outChannel);
     getCC65Config(outChannel);
     getCC65Options(outChannel);
+    getCC65CreateDebugInfo(outChannel);
     getCC65Target(outChannel);
     getCC65Extension(outChannel);
     getCC65BuildOutput(outChannel);
@@ -149,6 +188,7 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     getCC65TestEnv(outChannel);
     getCC65EmulatorPrelaunch(outChannel);
     getCC65EmulatorOptions(outChannel);
+    getCC65EmulatorQuickConfig(outChannel);
 
     outChannel.appendLine("END  cc65 configuration   END");
 }
@@ -174,16 +214,15 @@ function buildProgramCL65() {
     let vscodeenv: string = getCC65VSCodeEnv();
     let buildDir: string = getCC65BuildOutput();
 
+    let createDebugInfo: boolean = getCC65CreateDebugInfo();
+
     if (targetExtension === "target") {
         targetExtension = target;
     }
 
 	// will be based off of the workspace name
-	// what if we are not in a workspace?
-    var programName: string = vscode.workspace.name!;
-
-	let programNames: string[] = programName.split(" ");
-    programName = programNames[0];
+    // what if we are not in a workspace?
+    let programName: string = getProgramName();
 
     if (cc65Path === "") {
 		vscode.window.showErrorMessage('Set cc65 in User Settings.');
@@ -197,7 +236,7 @@ function buildProgramCL65() {
         return errorCode;
 	}
 
-    let extension: string = "";
+    let toolExtension: string = "";
     let fileseparator: string = "/";
     let altRootPath: string = vscode.workspace.workspaceFolders![0].uri.fsPath.trim();
     let rootpath: string = vscode.workspace.rootPath!.trim();
@@ -222,7 +261,7 @@ function buildProgramCL65() {
         }
     } else {
         fileseparator = "\\";
-        extension = ".exe";
+        toolExtension = ".exe";
     }
 
     let command = "powershell.exe";
@@ -291,17 +330,17 @@ function buildProgramCL65() {
                 var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
 
                 fs.appendFileSync(filename,
-                    cc65Path + fileseparator + "cc65" + extension +
+                    cc65Path + fileseparator + "cc65" + toolExtension +
                     " -verbose" +
-                    " -g " +
+                    (createDebugInfo ? " -g " : "") +
                     " -t " + target +
                     " " + cc65Options +
                     " " + oneFile +"\n", "utf8");
     
                     fs.appendFileSync(filename,
-                    cc65Path + fileseparator + "ca65" + extension +
-                    " -verbose"+
-                    " -g "+
+                    cc65Path + fileseparator + "ca65" + toolExtension +
+                    " -verbose" +
+                    (createDebugInfo ? " -g " : "") +
                     " " + oneFile.replace(".c",".s") +"\n", "utf8" );
                     
                     objectFilesSet.add(oneFile.replace(".c", ".o"));
@@ -319,9 +358,9 @@ function buildProgramCL65() {
                 var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
 
                 fs.appendFileSync(filename,
-                cc65Path + fileseparator + "ca65" + extension +
+                cc65Path + fileseparator + "ca65" + toolExtension +
                 " -verbose" +
-                " -g " +
+                (createDebugInfo ? " -g " : "") +
                 " -t " + target +
                 " " + oneFile +"\n", "utf8");
 
@@ -345,9 +384,10 @@ function buildProgramCL65() {
 
             outputChannel.append('' + config);
             fs.appendFileSync(filename,
-                cc65Path + fileseparator + "ld65" + extension +
+                cc65Path + fileseparator + "ld65" + toolExtension +
                 (config ? " -C " + config : " -t " + target) +
-                " -Ln " + programName + "." + target + ".lbl" +
+                (createDebugInfo ? " -Ln " + programName + "." + targetExtension + ".lbl" : "") +
+                (createDebugInfo ? " --dbgfile " + programName + "." + targetExtension + ".dbg" : "") +
                 " -o " + programName + "." + targetExtension +
                 " " + allObjectFiles +
                 " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
@@ -461,29 +501,42 @@ function buildProgramMake() {
     
 }
 
-function launchEmulator() {
+function launchEmulator(launchProgram:boolean) {
 
-    let nyi:boolean = true;
-    if (nyi) {
-        vscode.window.showErrorMessage('launch emulator not yet supported');
+
+    let emulatorOptions = getCC65EmulatorOptions();
+    let testenv = getCC65TestEnv();
+    let vscodeenv = getCC65VSCodeEnv();
+    let quickConfig = getCC65EmulatorQuickConfig();
+    let programName: string = getProgramName();
+    let targetExtension: string = getCC65Extension();
+    let target: string = getCC65Target();
+
+    let emulatorPath:string = getCC65EmulatorPath();
+
+    if (!emulatorPath) {
+        vscode.window.showErrorMessage('cc65 emulator path not set. Check User Settings.');
         return;
     }
 
+	if (!fs.existsSync(emulatorPath)) {
+        vscode.window.showErrorMessage('cc65 emulator not found. Check User Settings.');
+        return;
+	}
 
-	let outputChannel = vscode.window.createOutputChannel('Altirra');
+    let emulatorName:string = path.basename(emulatorPath, path.extname(emulatorPath));
+
+	let outputChannel = vscode.window.createOutputChannel(emulatorName);
     outputChannel.clear();
     outputChannel.show();
     //dumpConfig(outputChannel);
 
-    let emulatorPath = getCC65EmulatorPath();
-    let emulatorOptions = getCC65EmulatorOptions();
-    let testenv = getCC65TestEnv();
-    let vscodeenv = getCC65VSCodeEnv();
+    let altRootPath: string = vscode.workspace.workspaceFolders![0].uri.fsPath.trim();
+    let rootpath: string = vscode.workspace.rootPath!.trim();
 
-	if (!fs.existsSync(emulatorPath)) {
-        vscode.window.showErrorMessage('cc65 emulator path not found. Check User Settings.');
-        return;
-	}
+    if (altRootPath === rootpath) {
+        outputChannel.appendLine("The paths are the same");
+    }
 
     var shell = "powershell.exe";
 
@@ -491,17 +544,42 @@ function launchEmulator() {
         shell = "bash";
     } else if (testenv === "linux" && vscodeenv === "windows") {
         shell = "wsl";
+    } else if (testenv === "windows" && vscodeenv === "windows") {
+        shell = "powershell.exe";
+    } else 	{
+        vscode.window.showErrorMessage('cc65 test env misconfigured. Check User Settings.');
+        return;
     }
 
-	// how can we pass the output value of the build or make...
-    emulatorOptions = "-c " + emulatorPath + " " + emulatorOptions;
+    if (quickConfig === "altirra") { 
+        let finalEmulatorOptions: string = "/debug /singleinstance /w "; 
+        
+        if (target === 'atari') {
+            finalEmulatorOptions += " /defprofile:800 ";
+        } else if (target === 'atarixl') {
+            finalEmulatorOptions += " /defprofile:xl ";
+        }
+        
+        finalEmulatorOptions += " " + emulatorOptions;
+
+        if (launchProgram) {
+            finalEmulatorOptions += " /run " + programName + "." + targetExtension;
+        }
+        emulatorOptions = emulatorPath + " " + finalEmulatorOptions;
+    } else if (quickConfig === "VICE") {
+        vscode.window.showErrorMessage('cc65 VICE not supported via quick config yet. Check User Settings.');
+        return;
+    } else {
+        // if not quick config, then just do the simple thing
+        emulatorOptions = emulatorPath + " " + emulatorOptions;
+    }
 
     let params = emulatorOptions.split(" ");
 
     let emulator = cp.spawn(shell, params, {
         //shell: shell,
         detached: false,
-        cwd: vscode.workspace.rootPath!.trim()
+        cwd: rootpath
     });
 
     emulator.on('close', function (e) {
@@ -557,7 +635,7 @@ function runProgram() {
             if (e !== 0) {
                 vscode.window.showErrorMessage('Prelaunch failed with errors.');
             } else {
-                launchEmulator();
+                launchEmulator(true);
             }
         });
 
@@ -572,7 +650,7 @@ function runProgram() {
         prelaunch.unref();
     } else {
 		// launch it
-        launchEmulator();
+        launchEmulator(true);
     }
 
 }

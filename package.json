@@ -104,8 +104,12 @@
 				"title": "CC65: Build Directly & Run Emulator"
 			},
 			{
-				"command": "cc65.run",
-				"title": "CC65: Run Emulator"
+				"command": "cc65.run.program",
+				"title": "CC65: Run Program in Emulator"
+			},
+			{
+				"command": "cc65.run.emulator",
+				"title": "CC65: Launch the Emulator"
 			}
 		],
 		"snippets": [
@@ -118,26 +122,31 @@
 			"type": "object",
 			"title": "cc65-redux",
 			"properties": {
-				"cc65.cc65.compilerToolsPath": {
+				"cc65.compilerToolsPath": {
 					"type": "string",
 					"default": "C:\\cc65\\bin",
 					"description": "Path to cc65 binary files.",
 					"required": true
 				},
-				"cc65.cl65.config": {
-					"type": "string",
-					"default": "C:\\cc65\\cfg\\atarixl.cfg",
-					"desription": "Config file to use for LD65, such as 'src/vic20-32k.cfg'"
-				},
-				"cc65.cl65.options": {
-					"type": "string",
-					"default": "",
-					"description": "Linker options"
+				"cc65.createDebugInfo": {
+					"type": "boolean",
+					"default": true,
+					"description": "Generate Debug info and listing files"
 				},
 				"cc65.cc65.options": {
 					"type": "string",
 					"default": "-Oi",
 					"description": "cc65 C compiler options"
+				},
+				"cc65.cl65.config": {
+					"type": "string",
+					"default": "C:\\cc65\\cfg\\atarixl.cfg",
+					"description": "Config file to use for ld65, such as 'cc65/cfg/atari.cfg'"
+				},
+				"cc65.cl65.options": {
+					"type": "string",
+					"default": "",
+					"description": "Linker options for cl65"
 				},
 				"cc65.cl65.target": {
 					"type": "string",
@@ -194,13 +203,13 @@
 						"Oric Telestrat",
 						"Commodore VIC20"
 					],
-					"description": "Target system for LD65 to link against.",
+					"description": "Target system for ld65 to link against.",
 					"required": true
 				},
 				"cc65.cl65.extension": {
 					"type": "string",
 					"default": "xex",
-					"desription": "What extension to put on the file, e.g .d, .xex. Use 'target' to make the extension be the same as cl65.target"
+					"description": "What extension to put on the file, e.g .d, .xex. Use 'target' to make the extension be the same as cl65.target"
 				},
 				"cc65.env.buildOutput": {
 					"type": "string",
@@ -232,13 +241,28 @@
 				},
 				"cc65.emulator.path": {
 					"type": "string",
-					"default": "",
+					"default": "C:\\Users\\Steve\\_Emulators\\Altirra-3.20\\Altirra64.exe",
 					"description": "Path to the emulator."
 				},
 				"cc65.emulator.options": {
 					"type": "string",
 					"default": "",
 					"description": "Command line options to pass to the emulator."
+				}, 
+				"cc65.emulator.quickConfig": {
+					"type": "string",
+					"default": "none",
+					"enum": [
+						"none",
+						"altirra",
+						"VICE"
+					],
+					"enumDescriptions": [
+						"No quick config",
+						"Use flags for Altirra emulator when launching",
+						"Use flags for VICE emulator when launching (NOT YET IMPLEMENTED)"
+					],
+					"description": "Pass common flags to the emulator."
 				}
 			}
 		}
