@@ -573,7 +573,7 @@ function launchEmulator(launchProgram:boolean) {
         // if not quick config, then just do the simple thing
         emulatorOptions = emulatorPath + " " + emulatorOptions;
     }
-
+    
     let params = emulatorOptions.split(" ");
 
     let emulator = cp.spawn(shell, params, {
