@@ -552,14 +552,17 @@ function launchEmulator(launchProgram:boolean) {
     }
 
     if (quickConfig === "altirra") { 
-        let finalEmulatorOptions: string = "/debug /singleinstance /w "; 
-        
+        let finalEmulatorOptions: string = "/debug /singleinstance "; 
+
+/*                
         if (target === 'atari') {
             finalEmulatorOptions += " /defprofile:800 ";
         } else if (target === 'atarixl') {
             finalEmulatorOptions += " /defprofile:xl ";
         }
-        
+*/
+        finalEmulatorOptions += " /autoprofile ";
+
         finalEmulatorOptions += " " + emulatorOptions;
 
         if (launchProgram) {
