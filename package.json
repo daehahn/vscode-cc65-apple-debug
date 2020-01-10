@@ -92,6 +92,10 @@
 				"title": "CC65: Build Directly"
 			},
 			{
+				"command": "cc65.clean",
+				"title": "CC65: Clean the build directory"
+			},
+			{
 				"command": "cc65.make.build",
 				"title": "CC65: Build with Make"
 			},

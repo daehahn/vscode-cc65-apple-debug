@@ -11,12 +11,12 @@ import * as path from 'path';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext): void {
 
-	// all the regular commands
-	buildCommands(context);
+    // all the regular commands
+    buildCommands(context);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "cc65-redux" is now active!');
+    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    // This line of code will only be executed once when your extension is activated
+    console.log('Congratulations, your extension "cc65-redux" is now active!');
 }
 
 //declare function buildProgramCL65(void): number;
@@ -39,6 +39,12 @@ function buildCommands(context: vscode.ExtensionContext): void {
         buildProgramCL65();
     });
 
+    let commandClean = vscode.commands.registerCommand('cc65.clean', function () {
+
+        cleanBuildOutput();
+    });
+
+
     //  define the build and run command
     let commandBuildRunMake = vscode.commands.registerCommand('cc65.make.build_run', function () {
 
@@ -52,16 +58,16 @@ function buildCommands(context: vscode.ExtensionContext): void {
     let commandBuildMake = vscode.commands.registerCommand('cc65.make.build', function () {
 
         buildProgramMake();
-	});
-	
-	let commandRun = vscode.commands.registerCommand('cc65.run.program', function () {
-		// this should run the program in the emulator
-		runProgram();
     });
-    
+
+    let commandRun = vscode.commands.registerCommand('cc65.run.program', function () {
+        // this should run the program in the emulator
+        runProgram();
+    });
+
     let commandRunEmu = vscode.commands.registerCommand('cc65.run.emulator', function () {
-		// this should just launch the emulator
-		launchEmulator(false);
+        // this should just launch the emulator
+        launchEmulator(false);
     });
 
     let commandTest = vscode.commands.registerCommand('cc65.test', function () {
@@ -70,6 +76,7 @@ function buildCommands(context: vscode.ExtensionContext): void {
     });
 
     context.subscriptions.push(commandBuild);
+    context.subscriptions.push(commandClean);
     context.subscriptions.push(commandBuildRun);
     context.subscriptions.push(commandBuildMake);
     context.subscriptions.push(commandBuildRunMake);
@@ -87,7 +94,7 @@ function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.Outpu
         outChannel.appendLine(v);
     }
 
-	return v;
+    return v;
 }
 
 function getOneBooleanConfig(key: string, defaultVal: boolean, outChannel?: vscode.OutputChannel): boolean {
@@ -100,73 +107,73 @@ function getOneBooleanConfig(key: string, defaultVal: boolean, outChannel?: vsco
         outChannel.appendLine(v.toString());
     }
 
-	return v;
+    return v;
 }
 
-function getCC65Path(outChannel?: vscode.OutputChannel) : string {
+function getCC65Path(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('compilerToolsPath', "C:\\cc65\\bin", outChannel || undefined);
 }
 
-function getCC65Config(outChannel?: vscode.OutputChannel) : string {
+function getCC65Config(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cl65.config', "C:\\cc65\\cfg\\atarixl.cfg", outChannel || undefined);
 }
 
-function getCC65Options(outChannel?: vscode.OutputChannel) : string {
+function getCC65Options(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cc65.options', "", outChannel || undefined);
 }
 
-function getCC65CreateDebugInfo(outChannel?: vscode.OutputChannel) : boolean {
+function getCC65CreateDebugInfo(outChannel?: vscode.OutputChannel): boolean {
     return getOneBooleanConfig('createDebugInfo', true, outChannel || undefined);
 }
 
-function getCC65Target(outChannel?: vscode.OutputChannel) : string {
+function getCC65Target(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cl65.target', "atarixl", outChannel || undefined);
 }
 
-function getCC65Extension(outChannel?: vscode.OutputChannel) : string {
+function getCC65Extension(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cl65.extension', "xex", outChannel || undefined);
 }
 
-function getCC65BuildOutput(outChannel?: vscode.OutputChannel) : string {
+function getCC65BuildOutput(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('env.buildOutput', "build", outChannel || undefined);
 }
 
-function getCC65BuildEnv(outChannel?: vscode.OutputChannel) : string {
+function getCC65BuildEnv(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('env.build', "windows", outChannel || undefined);
 }
 
-function getCC65VSCodeEnv(outChannel?: vscode.OutputChannel) : string {
+function getCC65VSCodeEnv(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('env.vscode', "windows", outChannel || undefined);
 }
 
-function getCC65TestEnv(outChannel?: vscode.OutputChannel) : string {
+function getCC65TestEnv(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('env.test', "windows", outChannel || undefined);
 }
 
-function getCC65EmulatorPrelaunch(outChannel?: vscode.OutputChannel) : string {
+function getCC65EmulatorPrelaunch(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('emulator.prelaunch', "", outChannel || undefined);
 }
 
-function getCC65EmulatorPath(outChannel?: vscode.OutputChannel) : string {
+function getCC65EmulatorPath(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('emulator.path', "", outChannel || undefined);
 }
 
-function getCC65EmulatorOptions(outChannel?: vscode.OutputChannel) : string {
+function getCC65EmulatorOptions(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('emulator.options', "", outChannel || undefined);
 }
 
-function getCC65EmulatorQuickConfig(outChannel?: vscode.OutputChannel) : string {
+function getCC65EmulatorQuickConfig(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('emulator.quickConfig', "", outChannel || undefined);
 }
 
-function getProgramName() : string {
-	// will be based off of the workspace name
-	// what if we are not in a workspace?
+function getProgramName(): string {
+    // will be based off of the workspace name
+    // what if we are not in a workspace?
     var programName: string = vscode.workspace.name!;
 
-	let programNames: string[] = programName.split(" ");
+    let programNames: string[] = programName.split(" ");
     programName = programNames[0];
-    
+
     return programName;
 }
 
@@ -174,7 +181,7 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     let configuration = vscode.workspace.getConfiguration('cc65');
 
     outChannel.appendLine("BEGIN cc65 configuration BEGIN");
-    
+
     // seems no way to do this automatically, super annoying
     getCC65Path(outChannel);
     getCC65Config(outChannel);
@@ -193,6 +200,16 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     outChannel.appendLine("END  cc65 configuration   END");
 }
 
+function cleanBuildOutput() {
+
+    let outputChannel = vscode.window.createOutputChannel('cc65');
+    outputChannel.clear();
+    outputChannel.show();
+    dumpConfig(outputChannel);
+
+    outputChannel.appendLine("Not implemented yet.");
+}
+
 
 // build the program
 function buildProgramCL65() {
@@ -200,7 +217,7 @@ function buildProgramCL65() {
     let errorCode = 0;
 
     // Check path settings
-    let outputChannel = vscode.window.createOutputChannel('cl65 Build');
+    let outputChannel = vscode.window.createOutputChannel('cc65');
     outputChannel.clear();
     outputChannel.show();
     dumpConfig(outputChannel);
@@ -220,21 +237,21 @@ function buildProgramCL65() {
         targetExtension = target;
     }
 
-	// will be based off of the workspace name
+    // will be based off of the workspace name
     // what if we are not in a workspace?
     let programName: string = getProgramName();
 
     if (cc65Path === "") {
-		vscode.window.showErrorMessage('Set cc65 in User Settings.');
-		errorCode = -1;
+        vscode.window.showErrorMessage('Set cc65 in User Settings.');
+        errorCode = -1;
         return errorCode;
-	}
-	
-	if (!fs.existsSync(cc65Path)) {
+    }
+
+    if (!fs.existsSync(cc65Path)) {
         vscode.window.showErrorMessage('cc65 path not found. Check User Settings.');
-		errorCode = -2;
+        errorCode = -2;
         return errorCode;
-	}
+    }
 
     let toolExtension: string = "";
     let fileseparator: string = "/";
@@ -271,33 +288,35 @@ function buildProgramCL65() {
         command = "bash";
     } else if (buildenv === "linux" && vscodeenv === "windows") {
         command = "powershell.exe";
-	} else if (buildenv === "windows" && vscodeenv === "windows") {
-		command = "powershell.exe";
-	} else 	{
+    } else if (buildenv === "windows" && vscodeenv === "windows") {
+        command = "powershell.exe";
+    } else {
         vscode.window.showErrorMessage('cc65 build env misconfigured. Check User Settings.');
-		errorCode = -3;
+        errorCode = -3;
         return errorCode;
     }
-    
+
     // temp - only support windows/windows
     if (buildenv !== "windows" || vscodeenv !== "windows") {
         vscode.window.showErrorMessage('cc65 Only windows for buildenv and vscodeenv is supported right now. Check User Settings.');
-		errorCode = -4;
+        errorCode = -4;
         return errorCode;
     }
 
+    let buildingOnWindows: Boolean = false;
     if (buildenv === "windows") {
+        buildingOnWindows = true;
         scriptExt = ".bat";
     }
 
-	outputChannel.append("Building using buildenv: ");
-	outputChannel.append(buildenv);
-	outputChannel.append(" vscodenv: ");
-	outputChannel.append(vscodeenv);
-	outputChannel.appendLine("...");
+    outputChannel.append("Building using buildenv: ");
+    outputChannel.append(buildenv);
+    outputChannel.append(" vscodenv: ");
+    outputChannel.append(vscodeenv);
+    outputChannel.appendLine("...");
 
     var filename = vscode.workspace.rootPath!.trim() + "/cc65_plugin_build" + scriptExt;
-    if (buildenv === "windows") { 
+    if (buildenv === "windows") {
         fs.writeFileSync(filename, ":: CC65 Batch file for building\n");
     }
     else {
@@ -307,125 +326,166 @@ function buildProgramCL65() {
     var files = [];
     var objectFilesSet: Set<string> = new Set<string>();
 
-    let parameters:string[] = [];
-    if(command === "powershell.exe") {
+    let parameters: string[] = [];
+    if (command === "powershell.exe") {
         parameters = [
             "\"",
             "./cc65_plugin_build.bat\""
         ];
-	} else {
+    } else {
         parameters = [
             "-c",
             "./cc65_plugin_build.sh"
         ];
     }
 
+    // make sure the build dir is there
+    let outputBuildDir: string = rootpath + fileseparator + buildDir;
+    if (!fs.existsSync(outputBuildDir)) {
+        fs.mkdirSync(outputBuildDir);
+    }
+
     // This might be better to be a task instead of like this...
-	vscode.workspace.findFiles("src/**/*.c", "", 1000)
+    vscode.workspace.findFiles("src/**/*.c", "", 1000)
         .then(
-        (result) => {
-            files = result;
-            fs.appendFileSync(filename, "cd " + rootpath + "\n");
-            for (var index in files) {
-                var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
+            (result) => {
+                // this section is for compiling .c files into .s files and then generating .o files
+                files = result;
+                fs.appendFileSync(filename, "cd " + rootpath + "\n");
+                for (var index in files) {
+                    var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
 
-                fs.appendFileSync(filename,
-                    cc65Path + fileseparator + "cc65" + toolExtension +
-                    " -verbose" +
-                    (createDebugInfo ? " -g " : "") +
-                    " -t " + target +
-                    " " + cc65Options +
-                    " " + oneFile +"\n", "utf8");
-    
-                    fs.appendFileSync(filename,
-                    cc65Path + fileseparator + "ca65" + toolExtension +
-                    " -verbose" +
-                    (createDebugInfo ? " -g " : "") +
-                    " " + oneFile.replace(".c",".s") +"\n", "utf8" );
+                    let justFilename:string = oneFile.replace("src/", "");
+
+                    if (buildingOnWindows) {
+                        oneFile = oneFile.replace("/", "\\");
+                    }
                     
-                    objectFilesSet.add(oneFile.replace(".c", ".o"));
-             }
-        },
-        (reason) => {
-            console.log(reason);
-        }
-        ).then(() => {
-            vscode.workspace.findFiles("src/**/*.s", "", 1000).then(
-                (result) => {
-            files = result;
+                    let pathPrefix: string = ""; // rootpath + fileseparator
+                    let compilerResultFile: string = pathPrefix + buildDir + fileseparator + justFilename.replace(".c", ".s");
+                    let assembler65ResultFile: string = pathPrefix + buildDir + fileseparator + justFilename.replace(".c", ".o");
 
-            for (var index in files) {
-                var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
+                    fs.appendFileSync(filename,
+                        cc65Path + fileseparator + "cc65" + toolExtension +
+                        " -verbose" +
+                        (createDebugInfo ? " -g " : "") +
+                        " -t " + target +
+                        " " + cc65Options +
+                        " " + oneFile +
+                        " -o " + compilerResultFile +
+                        "\n", "utf8");
 
-                fs.appendFileSync(filename,
-                cc65Path + fileseparator + "ca65" + toolExtension +
-                " -verbose" +
-                (createDebugInfo ? " -g " : "") +
-                " -t " + target +
-                " " + oneFile +"\n", "utf8");
+                    fs.appendFileSync(filename,
+                        cc65Path + fileseparator + "ca65" + toolExtension +
+                        " -verbose" +
+                        (createDebugInfo ? " -g " : "") +
+                        " -t " + target +
+                        " " + compilerResultFile +
+                        " -o " + assembler65ResultFile +
+                        //" " + oneFile.replace(".c",".s") + 
+                        "\n", "utf8");
 
-                objectFilesSet.add(oneFile.replace(".s", ".o"));
-             }
-        },
-        (reason) => {
-            console.log(reason);
-        }
-        ).then(() => {
-
-            var objectFiles: string[] = [];
-
-            for (let s of objectFilesSet) {
-                objectFiles.push(s);
+                    objectFilesSet.add(assembler65ResultFile);
+                }
+            },
+            (reason) => {
+                console.log(reason);
             }
+        ).then(
+            () => {
+                // this section is for assembling .s files into .o files 
+                vscode.workspace.findFiles("src/**/*.s", "", 1000).then(
+                    (result) => {
+                        files = result;
 
-            var allObjectFiles = objectFiles.join(' ');
+                        for (var index in files) {
+                            var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
 
-            // to consider - adding an output/build dir
+                            let justFilename:string = oneFile.replace("src/", "");
 
-            outputChannel.append('' + config);
-            fs.appendFileSync(filename,
-                cc65Path + fileseparator + "ld65" + toolExtension +
-                (config ? " -C " + config : " -t " + target) +
-                (createDebugInfo ? " -Ln " + programName + "." + targetExtension + ".lbl" : "") +
-                (createDebugInfo ? " --dbgfile " + programName + "." + targetExtension + ".dbg" : "") +
-                " -o " + programName + "." + targetExtension +
-                " " + allObjectFiles +
-                " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
-            );
-		});
-		
-		outputChannel.appendLine("running command...");
-		outputChannel.append(command);
-		outputChannel.append(" ");
-		outputChannel.append(parameters.join(" "));
-		outputChannel.appendLine("...");
+                            if (buildingOnWindows) {
+                                oneFile = oneFile.replace("/", "\\");
+                            }
+                            
+                            let pathPrefix: string = ""; // rootpath + fileseparator
+                            let assembler65ResultFile: string = pathPrefix + buildDir + fileseparator + justFilename.replace(".s", ".o");
 
-		// this runs the command
-        let ca = cp.spawn(command, parameters, {
-            detached: false,
-            shell: true,
-            cwd: vscode.workspace.rootPath!.trim()
-        });
+                            fs.appendFileSync(filename,
+                                cc65Path + fileseparator + "ca65" + toolExtension +
+                                " -verbose" +
+                                (createDebugInfo ? " -g " : "") +
+                                " -t " + target +
+                                " " + oneFile +
+                                " -o " + assembler65ResultFile +
+                                "\n", "utf8");
 
-        ca.on("close", (e) => {
-            outputChannel.appendLine('Child process exit code: ' + e);
-			errorCode = e;
-			// add config for this
-            if (errorCode !== 0) {
-                vscode.window.showErrorMessage('Compilation failed with errors.');
-            }
-        });
+                            objectFilesSet.add(assembler65ResultFile);
+                        }
+                    },
+                    (reason) => {
+                        console.log(reason);
+                    }
+                ).then(
+                    () => {
+                        // this section runs the linker to create the .xex
+                        var objectFiles: string[] = [];
 
-        ca.stdout.on('data', function (data) {
-            outputChannel.append('' + data);
-        });
+                        for (let s of objectFilesSet) {
+                            objectFiles.push(s);
+                        }
 
-        ca.stderr.on('data', function (data) {
-            outputChannel.append('' + data);
-		});
-		
-		outputChannel.appendLine("... finished.");
-    });
+                        var allObjectFiles = objectFiles.join(' ');
+                        
+                        // put everything in the buildDir
+                        let prefixpath: string = ""; // rootpath + fileseparator;
+                        let progPath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension;
+                        let labelPath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension + ".lbl";
+                        let debugFilepath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension + ".dbg";
+
+                        outputChannel.append('' + config);
+                        fs.appendFileSync(filename,
+                            cc65Path + fileseparator + "ld65" + toolExtension +
+                            (config ? " -C " + config : " -t " + target) +
+                            (createDebugInfo ? " -Ln " + labelPath : "") +
+                            (createDebugInfo ? " --dbgfile " + debugFilepath : "") +
+                            " -o " + progPath +
+                            " " + allObjectFiles +
+                            " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
+                        );
+                    });
+
+                outputChannel.appendLine("running command...");
+                outputChannel.append(command);
+                outputChannel.append(" ");
+                outputChannel.append(parameters.join(" "));
+                outputChannel.appendLine("...");
+
+                // this runs the command
+                let ca = cp.spawn(command, parameters, {
+                    detached: false,
+                    shell: true,
+                    cwd: vscode.workspace.rootPath!.trim()
+                });
+
+                ca.on("close", (e) => {
+                    outputChannel.appendLine('Child process exit code: ' + e);
+                    errorCode = e;
+                    // add config for this
+                    if (errorCode !== 0) {
+                        vscode.window.showErrorMessage('Compilation failed with errors.');
+                    }
+                });
+
+                ca.stdout.on('data', function (data) {
+                    outputChannel.append('' + data);
+                });
+
+                ca.stderr.on('data', function (data) {
+                    outputChannel.append('' + data);
+                });
+
+                outputChannel.appendLine("... finished.");
+            });
 
     return errorCode;
 }
@@ -436,7 +496,7 @@ function buildProgramCL65() {
  */
 function buildProgramMake() {
 
-    let nyi:boolean = true;
+    let nyi: boolean = true;
     if (nyi) {
         vscode.window.showErrorMessage('makefile building not yet supported');
         return;
@@ -445,7 +505,7 @@ function buildProgramMake() {
 
     let errorCode = 0;
 
-    let outputChannel = vscode.window.createOutputChannel('cc65 Build (make)');
+    let outputChannel = vscode.window.createOutputChannel('cc65');
     outputChannel.clear();
     outputChannel.show();
     dumpConfig(outputChannel);
@@ -461,24 +521,24 @@ function buildProgramMake() {
         command = "bash";
     } else if (buildenv === "linux" && vscodeenv === "windows") {
         command = "wsl";
-	}
+    }
 
-	outputChannel.append("Making using buildenv: ");
-	outputChannel.append(buildenv);
-	outputChannel.append(" vscodenv: ");
-	outputChannel.append(vscodeenv);
-	outputChannel.append(" target: ");
-	outputChannel.append(target);
-	outputChannel.appendLine("...");
+    outputChannel.append("Making using buildenv: ");
+    outputChannel.append(buildenv);
+    outputChannel.append(" vscodenv: ");
+    outputChannel.append(vscodeenv);
+    outputChannel.append(" target: ");
+    outputChannel.append(target);
+    outputChannel.appendLine("...");
 
     let make = cp.spawn(command, [
         "make",
         "T=" + target
     ], {
-            detached: false,
-            shell: true,
-            cwd: vscode.workspace.rootPath!.trim()
-        });
+        detached: false,
+        shell: true,
+        cwd: vscode.workspace.rootPath!.trim()
+    });
 
     make.on('close', function (e) {
         outputChannel.appendLine('Child process exit code: ' + e);
@@ -498,10 +558,10 @@ function buildProgramMake() {
 
     return errorCode;
 
-    
+
 }
 
-function launchEmulator(launchProgram:boolean) {
+function launchEmulator(launchProgram: boolean) {
 
 
     let emulatorOptions = getCC65EmulatorOptions();
@@ -510,23 +570,29 @@ function launchEmulator(launchProgram:boolean) {
     let quickConfig = getCC65EmulatorQuickConfig();
     let programName: string = getProgramName();
     let targetExtension: string = getCC65Extension();
-    let target: string = getCC65Target();
+    //let target: string = getCC65Target();
+    let buildDir: string = getCC65BuildOutput();
+    let fileseparator: string = "/";
 
-    let emulatorPath:string = getCC65EmulatorPath();
+    let emulatorPath: string = getCC65EmulatorPath();
 
     if (!emulatorPath) {
         vscode.window.showErrorMessage('cc65 emulator path not set. Check User Settings.');
         return;
     }
 
-	if (!fs.existsSync(emulatorPath)) {
+    if (!fs.existsSync(emulatorPath)) {
         vscode.window.showErrorMessage('cc65 emulator not found. Check User Settings.');
         return;
-	}
+    }
 
-    let emulatorName:string = path.basename(emulatorPath, path.extname(emulatorPath));
+    if (vscodeenv === "windows") {
+        fileseparator = "\\";
+    }
 
-	let outputChannel = vscode.window.createOutputChannel(emulatorName);
+    let emulatorName: string = path.basename(emulatorPath, path.extname(emulatorPath));
+
+    let outputChannel = vscode.window.createOutputChannel(emulatorName);
     outputChannel.clear();
     outputChannel.show();
     //dumpConfig(outputChannel);
@@ -546,27 +612,27 @@ function launchEmulator(launchProgram:boolean) {
         shell = "wsl";
     } else if (testenv === "windows" && vscodeenv === "windows") {
         shell = "powershell.exe";
-    } else 	{
+    } else {
         vscode.window.showErrorMessage('cc65 test env misconfigured. Check User Settings.');
         return;
     }
 
-    if (quickConfig === "altirra") { 
-        let finalEmulatorOptions: string = "/debug /singleinstance "; 
+    if (quickConfig === "altirra") {
+        let finalEmulatorOptions: string = "/debug /singleinstance ";
 
-/*                
-        if (target === 'atari') {
-            finalEmulatorOptions += " /defprofile:800 ";
-        } else if (target === 'atarixl') {
-            finalEmulatorOptions += " /defprofile:xl ";
-        }
-*/
+        /*                
+                if (target === 'atari') {
+                    finalEmulatorOptions += " /defprofile:800 ";
+                } else if (target === 'atarixl') {
+                    finalEmulatorOptions += " /defprofile:xl ";
+                }
+        */
         finalEmulatorOptions += " /autoprofile ";
 
         finalEmulatorOptions += " " + emulatorOptions;
 
         if (launchProgram) {
-            finalEmulatorOptions += " /run " + programName + "." + targetExtension;
+            finalEmulatorOptions += " /run " + buildDir + fileseparator + programName + "." + targetExtension;
         }
         emulatorOptions = emulatorPath + " " + finalEmulatorOptions;
     } else if (quickConfig === "VICE") {
@@ -576,7 +642,7 @@ function launchEmulator(launchProgram:boolean) {
         // if not quick config, then just do the simple thing
         emulatorOptions = emulatorPath + " " + emulatorOptions;
     }
-    
+
     let params = emulatorOptions.split(" ");
 
     let emulator = cp.spawn(shell, params, {
@@ -606,8 +672,21 @@ function launchEmulator(launchProgram:boolean) {
 // run the emulator
 function runProgram() {
 
-	// change this to be configurable, but for now use Altirra
-	let outputChannel = vscode.window.createOutputChannel('Altirra');
+    let emulatorPath: string = getCC65EmulatorPath();
+
+    if (!emulatorPath) {
+        vscode.window.showErrorMessage('cc65 emulator path not set. Check User Settings.');
+        return;
+    }
+
+    if (!fs.existsSync(emulatorPath)) {
+        vscode.window.showErrorMessage('cc65 emulator not found. Check User Settings.');
+        return;
+    }
+
+    let emulatorName: string = path.basename(emulatorPath, path.extname(emulatorPath));
+    // change this to be configurable, but for now use Altirra
+    let outputChannel = vscode.window.createOutputChannel(emulatorName);
     outputChannel.clear();
     outputChannel.show();
     dumpConfig(outputChannel);
@@ -615,8 +694,8 @@ function runProgram() {
     let testenv = getCC65TestEnv();
     let vscodeenv = getCC65VSCodeEnv();
     let emulatorPrelaunch = getCC65EmulatorPrelaunch();
-	
-	// do we actually need this?
+
+    // do we actually need this?
     if (emulatorPrelaunch) {
         var prelaunchParameters = emulatorPrelaunch.split(" ");
         var shell = "powershell.exe";
@@ -652,7 +731,7 @@ function runProgram() {
 
         prelaunch.unref();
     } else {
-		// launch it
+        // launch it
         launchEmulator(true);
     }
 
@@ -660,6 +739,6 @@ function runProgram() {
 
 // this method is called when your extension is deactivated
 export function deactivate(context: vscode.ExtensionContext) {
-	// shouldn't we unregister?
-	// how do we remove our commands
+    // shouldn't we unregister?
+    // how do we remove our commands
 }
