@@ -1,0 +1,17 @@
+{
+"extensionDependencies": [
+		"austin.code-gnu-global",
+		"christian-kohler.npm-intellisense",
+		"DavidAnson.vscode-markdownlint",
+		"dbaeumer.vscode-eslint",
+		"eg2.vscode-npm-script",
+		"formulahendry.auto-close-tag",
+		"formulahendry.auto-rename-tag",
+		"KnisterPeter.vscode-github",
+		"ms-vscode.cpptools",
+		"ms-vscode.csharp",
+		"ms-vscode.PowerShell",
+		"ms-vscode.Theme-MarkdownKit",
+		"rogalmic.bash-debug"
+	]
+}

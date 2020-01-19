@@ -24,8 +24,33 @@ export function activate(context: vscode.ExtensionContext): void {
 //declare function runProgram(void): void;
 
 function buildCommands(context: vscode.ExtensionContext): void {
-    //  define the build and run command
-    let commandBuildRun = vscode.commands.registerCommand('cc65.build_run', function () {
+
+    const cmdStrBuild = 'cc65.build';
+    const cmdStrRun = 'cc65.run.program';
+    const cmdStrRunEmu = 'cc65.run.emulator';
+    const cmdStrBuildRun = 'cc65.build_run';
+    const cmdStrClean = 'cc65.clean';
+    const cmdStrMakeBuild = 'cc65.make.build';
+    const cmdStrMakeBuildRun = 'cc65.make.build_run';
+    const cmdStrTest = 'cc65.test';
+
+    //  define direct build & run commands
+    let commandBuild = vscode.commands.registerCommand(cmdStrBuild, function () {
+
+        buildProgramCL65();
+    });
+
+    let commandRun = vscode.commands.registerCommand(cmdStrRun, function () {
+        // this should run the program in the emulator
+        runProgram();
+    });
+
+    let commandRunEmu = vscode.commands.registerCommand(cmdStrRunEmu, function () {
+        // this should just launch the emulator
+        launchEmulator(false);
+    });
+
+    let commandBuildRun = vscode.commands.registerCommand(cmdStrBuildRun, function () {
 
         if (buildProgramCL65() === 0) {
 
@@ -33,20 +58,22 @@ function buildCommands(context: vscode.ExtensionContext): void {
         }
     });
 
-    //  define the build command
-    let commandBuild = vscode.commands.registerCommand('cc65.build', function () {
-
-        buildProgramCL65();
-    });
-
-    let commandClean = vscode.commands.registerCommand('cc65.clean', function () {
+    // clean command
+    let commandClean = vscode.commands.registerCommand(cmdStrClean, function () {
 
         cleanBuildOutput();
     });
 
+    // make based commmands
+
+    //  define the build command
+    let commandBuildMake = vscode.commands.registerCommand(cmdStrMakeBuild, function () {
+
+        buildProgramMake();
+    });
 
     //  define the build and run command
-    let commandBuildRunMake = vscode.commands.registerCommand('cc65.make.build_run', function () {
+    let commandBuildRunMake = vscode.commands.registerCommand(cmdStrMakeBuildRun, function () {
 
         if (buildProgramMake() === 0) {
 
@@ -54,34 +81,68 @@ function buildCommands(context: vscode.ExtensionContext): void {
         }
     });
 
-    //  define the build command
-    let commandBuildMake = vscode.commands.registerCommand('cc65.make.build', function () {
+    // test command
 
-        buildProgramMake();
-    });
-
-    let commandRun = vscode.commands.registerCommand('cc65.run.program', function () {
-        // this should run the program in the emulator
-        runProgram();
-    });
-
-    let commandRunEmu = vscode.commands.registerCommand('cc65.run.emulator', function () {
-        // this should just launch the emulator
-        launchEmulator(false);
-    });
-
-    let commandTest = vscode.commands.registerCommand('cc65.test', function () {
+    let commandTest = vscode.commands.registerCommand(cmdStrTest, function () {
         // show something
         vscode.window.showInformationMessage('cc65 test command to activate from the command palette');
     });
 
+    // commands on status bar
     context.subscriptions.push(commandBuild);
+    context.subscriptions.push(commandRun);
+    context.subscriptions.push(commandRunEmu);
     context.subscriptions.push(commandClean);
+    // regular commands
     context.subscriptions.push(commandBuildRun);
     context.subscriptions.push(commandBuildMake);
     context.subscriptions.push(commandBuildRunMake);
-    context.subscriptions.push(commandRun);
     context.subscriptions.push(commandTest);
+
+    let textThemeColorKey: string = 'statusBarItem.prominentForeground';
+
+    let textColor: vscode.ThemeColor = new vscode.ThemeColor(textThemeColorKey);
+
+	var sbiBuild: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    sbiBuild.command = cmdStrBuild;
+    sbiBuild.color = textColor;
+    sbiBuild.text = '$(zap) Build';
+    sbiBuild.tooltip = 'CC65 Build Workspace';
+
+    var sbiRun: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+    sbiRun.command = cmdStrRun;
+    sbiRun.text = '$(debug-start) Run';
+    sbiRun.tooltip = 'CC65 Run built program in emulator';
+
+    var sbiRunEmu: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    sbiRunEmu.command = cmdStrRunEmu;
+    sbiRunEmu.text = '$(vm-running) Emu';
+    sbiRunEmu.tooltip = 'CC65 Launch Emulator';
+
+    var sbiClean: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
+    sbiClean.command = cmdStrClean;
+    sbiClean.text = '$(clear-all) Clean';
+    sbiClean.tooltip = 'CC65 Clean the workspace build dir';
+
+    context.subscriptions.push(sbiBuild);
+    context.subscriptions.push(sbiRun);
+    context.subscriptions.push(sbiRunEmu);
+    context.subscriptions.push(sbiClean);
+
+    let theConfig = vscode.workspace.getConfiguration('cc65');
+    let showOnStatusbar = theConfig.get('cc65.vscode.statusbar', true);
+
+    if (showOnStatusbar) {
+        sbiBuild.show();
+        sbiRun.show();
+        sbiRunEmu.show();
+        sbiClean.show();    
+    }
+
+    // $(fold)
+    // $(unfold)
+
+
 }
 
 function getOneConfig(key: string, defaultVal: string, outChannel?: vscode.OutputChannel): string {
@@ -202,12 +263,68 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
 
 function cleanBuildOutput() {
 
+    let errorCode = 0;
+
     let outputChannel = vscode.window.createOutputChannel('cc65');
     outputChannel.clear();
     outputChannel.show();
     dumpConfig(outputChannel);
 
-    outputChannel.appendLine("Not implemented yet.");
+    let buildenv: string = getCC65BuildEnv();
+    let vscodeenv: string = getCC65VSCodeEnv();
+
+    // temp - only support windows/windows
+    if (buildenv !== "windows" || vscodeenv !== "windows") {
+        vscode.window.showErrorMessage('cc65 Only windows for buildenv and vscodeenv is supported right now. Check User Settings.');
+        errorCode = -5;
+        return errorCode;
+    }
+
+    outputChannel.appendLine("Cleaning project build dir...");
+
+    let buildDir: string = getCC65BuildOutput();
+
+    if (buildDir === '') {
+        outputChannel.appendLine("Output build dir not configured.");
+        return errorCode;
+    }
+
+
+    let fileseparator: string = "/";
+    let rootpath: string = vscode.workspace.rootPath!.trim();
+
+
+    let outputBuildDir: string = rootpath + fileseparator + buildDir;
+
+    outputChannel.append("OutputBuildDir: ");
+    outputChannel.appendLine(outputBuildDir);
+
+    if (!fs.existsSync(outputBuildDir)) {
+        outputChannel.appendLine("No output build dir");
+        return errorCode;
+    }
+
+
+    // everything in the build dir should be removable... maybe just delete the entire contents
+
+    //vscode.window.showErrorMessage('Clean not implemented yet');
+    //fs.rmdirSync(outputBuildDir);
+    fs.readdir(outputBuildDir, (err, files) => {
+        if (err) {
+            throw err;
+        }
+      
+        for (const file of files) {
+          fs.unlink(path.join(outputBuildDir, file), err => {
+            if (err) { 
+                throw err;
+            }
+          });
+        }
+      });
+
+
+    return errorCode;
 }
 
 

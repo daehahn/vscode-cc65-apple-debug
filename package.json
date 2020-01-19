@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -267,6 +267,11 @@
 						"Use flags for VICE emulator when launching (NOT YET IMPLEMENTED)"
 					],
 					"description": "Pass common flags to the emulator."
+				},
+				"cc65.vscode.statusbar": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show CC65 Commands on Status Bar"
 				}
 			}
 		}
@@ -302,18 +307,6 @@
 		"onCommand:cc65.run"
 	],
 	"extensionDependencies": [
-		"austin.code-gnu-global",
-		"christian-kohler.npm-intellisense",
-		"DavidAnson.vscode-markdownlint",
-		"dbaeumer.vscode-eslint",
-		"eg2.vscode-npm-script",
-		"formulahendry.auto-close-tag",
-		"formulahendry.auto-rename-tag",
-		"KnisterPeter.vscode-github",
-		"ms-vscode.cpptools",
-		"ms-vscode.csharp",
-		"ms-vscode.PowerShell",
-		"ms-vscode.Theme-MarkdownKit",
-		"rogalmic.bash-debug"
+		"ms-vscode.PowerShell"
 	]
 }
