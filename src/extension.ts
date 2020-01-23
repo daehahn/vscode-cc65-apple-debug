@@ -556,8 +556,8 @@ function buildProgramCL65() {
                         // put everything in the buildDir
                         let prefixpath: string = ""; // rootpath + fileseparator;
                         let progPath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension;
-                        let labelPath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension + ".lbl";
-                        let debugFilepath: string = prefixpath + buildDir + fileseparator + programName + "." + targetExtension + ".dbg";
+                        let labelPath: string = prefixpath + buildDir + fileseparator + programName + ".lbl";
+                        let debugFilepath: string = prefixpath + buildDir + fileseparator + programName + ".dbg";
 
                         outputChannel.append('' + config);
                         fs.appendFileSync(filename,

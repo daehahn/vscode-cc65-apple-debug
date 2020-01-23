@@ -94,20 +94,3 @@ You must put your project in a VS Code workspace.  This workspace must have the 
 ## Known Issues
 
 None yet.
-
-## Release Notes
-
-### 0.0.1
-
-Revived extension
-Only building using windows/windows works so far
-
-### 0.0.8
-
-Added build output dir
-Modified stand alone build command to output to build dir
-Added launch emulator
-Added quick config for Altirra
-Added customizable extension for build target
-Added clean command to delete files in build dir
-Added StatusBarItem for common actions

@@ -25,3 +25,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - added quick config support for Altirra
 - added launch emulator for just starting the configured emulator
 
+## [0.0.8] - 2020-01-22
+
+- Added build output dir
+- Modified stand alone build command to output to build dir
+- Added launch emulator
+- Added quick config for Altirra
+- Added customizable extension for build target
+- Added clean command to delete files in build dir
+- Added StatusBarItem for common actions
+
+## [0.0.10] - 2020-01-22
+
+- fix output file names of label and debug files
