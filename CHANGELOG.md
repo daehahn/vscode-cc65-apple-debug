@@ -62,3 +62,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.16] - 2020-01-26
 
 - fix library link dir
+
+## [0.0.17] - 2020-01-26
+
+- change default config to atarixl-xex for C programs

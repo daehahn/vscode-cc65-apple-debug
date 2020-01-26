@@ -176,7 +176,7 @@ function getCC65Path(outChannel?: vscode.OutputChannel): string {
 }
 
 function getCC65Config(outChannel?: vscode.OutputChannel): string {
-    return getOneConfig('cl65.config', "C:\\cc65\\cfg\\atarixl.cfg", outChannel || undefined);
+    return getOneConfig('cl65.config', "C:\\cc65\\cfg\\atarixl-xex.cfg", outChannel || undefined);
 }
 
 function getCC65Options(outChannel?: vscode.OutputChannel): string {
@@ -366,6 +366,7 @@ function buildProgramCL65() {
     let tgiDriver: string = getCC65tgiDriver();
     let tgiLabel: string = getCC65tgiLabel();
 
+
     let createDebugInfo: boolean = getCC65CreateDebugInfo();
 
     if (targetExtension === "target") {
@@ -423,8 +424,8 @@ function buildProgramCL65() {
         return errorCode;
     }
 
-    let cc65Path_target: string = cc65Path + fileseparator + "target";
-    if (!fs.existsSync(cc65Path_target)) {
+    let cc65Path_targetDir: string = cc65Path + fileseparator + "target";
+    if (!fs.existsSync(cc65Path_targetDir)) {
         vscode.window.showErrorMessage('cc65 target path not found. Check User Settings. Check CC65 install.');
         errorCode = -2;
         return errorCode;
