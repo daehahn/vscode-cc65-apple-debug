@@ -54,3 +54,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.14] - 2020-01-26
 
 - add support for defining the label/variable name of the statically linked driver
+
+## [0.0.15] - 2020-01-26
+
+- fix default label to match tgi header

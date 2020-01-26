@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -154,7 +154,7 @@
 				},
 				"cc65.cl65.tgi.label": {
 					"type": "string",
-					"default": "_tgiDrv",
+					"default": "_tgi_static_stddrv",
 					"description": "TGI driver symbol name for static linking"
 				},
 				"cc65.cl65.options": {
