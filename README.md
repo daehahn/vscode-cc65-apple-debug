@@ -27,7 +27,7 @@ You will need to set the path to the CC65 package, for example:
 
 ```json
 {
-    "cc65.cc65": "C:\\cc65\\bin"
+    "cc65.cc65": "C:\\cc65"
 }
 ```
 

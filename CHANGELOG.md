@@ -46,3 +46,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.12] - 2020-01-25
 
 - add linker options back in
+
+## [0.0.13] - 2020-01-26
+
+- add support for static linking of tgi driver
+
+## [0.0.14] - 2020-01-26
+
+- add support for defining the label/variable name of the statically linked driver

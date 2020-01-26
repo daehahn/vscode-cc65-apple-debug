@@ -172,7 +172,7 @@ function getOneBooleanConfig(key: string, defaultVal: boolean, outChannel?: vsco
 }
 
 function getCC65Path(outChannel?: vscode.OutputChannel): string {
-    return getOneConfig('compilerToolsPath', "C:\\cc65\\bin", outChannel || undefined);
+    return getOneConfig('compilerToolsPath', "C:\\cc65", outChannel || undefined);
 }
 
 function getCC65Config(outChannel?: vscode.OutputChannel): string {
@@ -193,6 +193,14 @@ function getLD65Options(outChannel?: vscode.OutputChannel): string {
 
 function getCC65Target(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cl65.target', "atarixl", outChannel || undefined);
+}
+
+function getCC65tgiDriver(outChannel?: vscode.OutputChannel): string {
+    return getOneConfig('cl65.tgi.driver', "", outChannel || undefined);
+}
+
+function getCC65tgiLabel(outChannel?: vscode.OutputChannel): string {
+    return getOneConfig('cl65.tgi.label', "_tgiDrv", outChannel || undefined);
 }
 
 function getCC65Extension(outChannel?: vscode.OutputChannel): string {
@@ -254,6 +262,8 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     getCC65CreateDebugInfo(outChannel);
     getLD65Options(outChannel);
     getCC65Target(outChannel);
+    getCC65tgiDriver(outChannel);
+    getCC65tgiLabel(outChannel);
     getCC65Extension(outChannel);
     getCC65BuildOutput(outChannel);
     getCC65BuildEnv(outChannel);
@@ -353,6 +363,8 @@ function buildProgramCL65() {
     let buildenv: string = getCC65BuildEnv();
     let vscodeenv: string = getCC65VSCodeEnv();
     let buildDir: string = getCC65BuildOutput();
+    let tgiDriver: string = getCC65tgiDriver();
+    let tgiLabel: string = getCC65tgiLabel();
 
     let createDebugInfo: boolean = getCC65CreateDebugInfo();
 
@@ -402,6 +414,36 @@ function buildProgramCL65() {
     } else {
         fileseparator = "\\";
         toolExtension = ".exe";
+    }
+
+    let cc65Path_bin: string = cc65Path + fileseparator + "bin";
+    if (!fs.existsSync(cc65Path_bin)) {
+        vscode.window.showErrorMessage('cc65 bin path not found. Check User Settings. Check CC65 install.');
+        errorCode = -2;
+        return errorCode;
+    }
+
+    let cc65Path_target: string = cc65Path + fileseparator + "target";
+    if (!fs.existsSync(cc65Path_target)) {
+        vscode.window.showErrorMessage('cc65 target path not found. Check User Settings. Check CC65 install.');
+        errorCode = -2;
+        return errorCode;
+    }
+
+    // if we have a TGI file to link, do the work needed here
+    let tgiDriverPath: string = cc65Path + fileseparator + "target" + fileseparator + tgiDriver;
+    if (tgiDriver) {
+        if (!fs.existsSync(tgiDriverPath)) {
+            vscode.window.showErrorMessage('TGI driver file could not be found');
+            errorCode = -2;
+            return errorCode;
+        }
+
+        if (tgiLabel === "") {
+            vscode.window.showErrorMessage('TGI driver label not set');
+            errorCode = -2;
+            return errorCode;
+        }
     }
 
     let command = "powershell.exe";
@@ -468,13 +510,41 @@ function buildProgramCL65() {
         fs.mkdirSync(outputBuildDir);
     }
 
+    // first command of the script, cd to project dir
+    fs.appendFileSync(filename, "cd " + rootpath + "\n");
+
+    // if we have a TGI file to link, do the work needed here
+    // since the .s is generated, it should be in the build dir
+    let tgiDriverFileName: string = "";
+    let tgiDriverAssemblerFile: string = "";
+    if (tgiDriver) {
+
+        outputChannel.appendLine("Converting loadable driver to linked driver...");
+        tgiDriverFileName = path.parse(tgiDriverPath).name;
+        tgiDriverAssemblerFile = buildDir + fileseparator + tgiDriverFileName + ".s";
+        // add the command to make the driver static image
+        fs.appendFileSync(filename, 
+            cc65Path_target + fileseparator + "co65" + toolExtension +
+            " --code-label " + tgiLabel + 
+            " " + tgiDriverPath +
+            " -o " + tgiDriverAssemblerFile +
+            "\n", "utf8");
+            
+            let symbolName:string = tgiLabel.slice(1);
+
+            outputChannel.append("Make sure to declare the proper variable in source code: extern void ");
+            outputChannel.append(symbolName);
+            outputChannel.appendLine("[];");
+            outputChannel.appendLine("And corresponding tgi_install() call.");
+    }
+
+
     // This might be better to be a task instead of like this...
     vscode.workspace.findFiles("src/**/*.c", "", 1000)
         .then(
             (result) => {
                 // this section is for compiling .c files into .s files and then generating .o files
                 files = result;
-                fs.appendFileSync(filename, "cd " + rootpath + "\n");
                 for (var index in files) {
                     var oneFile = files[index].path.substring(files[index].path.indexOf("src/"));
 
@@ -489,7 +559,7 @@ function buildProgramCL65() {
                     let assembler65ResultFile: string = pathPrefix + buildDir + fileseparator + justFilename.replace(".c", ".o");
 
                     fs.appendFileSync(filename,
-                        cc65Path + fileseparator + "cc65" + toolExtension +
+                        cc65Path_bin + fileseparator + "cc65" + toolExtension +
                         " --verbose" +
                         (createDebugInfo ? " --debug-info " : "") +
                         " --target " + target +
@@ -499,7 +569,7 @@ function buildProgramCL65() {
                         "\n", "utf8");
 
                     fs.appendFileSync(filename,
-                        cc65Path + fileseparator + "ca65" + toolExtension +
+                        cc65Path_bin + fileseparator + "ca65" + toolExtension +
                         " --verbose" +
                         (createDebugInfo ? " --debug-info " : "") +
                         " --target " + target +
@@ -534,7 +604,7 @@ function buildProgramCL65() {
                             let assembler65ResultFile: string = pathPrefix + buildDir + fileseparator + justFilename.replace(".s", ".o");
 
                             fs.appendFileSync(filename,
-                                cc65Path + fileseparator + "ca65" + toolExtension +
+                                cc65Path_bin + fileseparator + "ca65" + toolExtension +
                                 " --verbose" +
                                 (createDebugInfo ? " --debug-info " : "") +
                                 " --target " + target +
@@ -544,6 +614,25 @@ function buildProgramCL65() {
 
                             objectFilesSet.add(assembler65ResultFile);
                         }
+                        
+                        // add the driver link file
+                        if (tgiDriverAssemblerFile) {
+                            
+                            // remember the what is the output
+                            let assemblerTGIdriverResultFile: string = tgiDriverAssemblerFile.replace(".s", ".o");
+
+                            fs.appendFileSync(filename,
+                                cc65Path_bin + fileseparator + "ca65" + toolExtension +
+                                " --verbose" +
+                                (createDebugInfo ? " --debug-info " : "") +
+                                " --target " + target +
+                                " " + tgiDriverAssemblerFile +
+                                " -o " + assemblerTGIdriverResultFile +
+                                "\n", "utf8");
+
+                            objectFilesSet.add(assemblerTGIdriverResultFile);                            
+                        }
+
                     },
                     (reason) => {
                         console.log(reason);
@@ -567,7 +656,7 @@ function buildProgramCL65() {
 
                         outputChannel.append('' + config);
                         fs.appendFileSync(filename,
-                            cc65Path + fileseparator + "ld65" + toolExtension +
+                            cc65Path_bin + fileseparator + "ld65" + toolExtension +
                             (config ? " -C " + config : " -t " + target) +
                             (createDebugInfo ? " -Ln " + labelPath : "") +
                             (createDebugInfo ? " --dbgfile " + debugFilepath : "") +
@@ -575,7 +664,7 @@ function buildProgramCL65() {
                             " -o " + progPath +
                             " " + allObjectFiles +
                             " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
-                        );
+                        );                        
                     });
 
                 outputChannel.appendLine("running command...");

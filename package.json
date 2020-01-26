@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.12",
+	"version": "0.0.14",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -128,7 +128,7 @@
 			"properties": {
 				"cc65.compilerToolsPath": {
 					"type": "string",
-					"default": "C:\\cc65\\bin",
+					"default": "C:\\cc65",
 					"description": "Path to cc65 binary files.",
 					"required": true
 				},
@@ -146,6 +146,16 @@
 					"type": "string",
 					"default": "C:\\cc65\\cfg\\atarixl.cfg",
 					"description": "Config file to use for ld65, such as 'cc65/cfg/atari.cfg'"
+				},
+				"cc65.cl65.tgi.driver": {
+					"type": "string",
+					"default": "",
+					"description": "TGI driver file to link statically, such as 'atarixl/drv/tgi/atr15p2.tgi'"
+				},
+				"cc65.cl65.tgi.label": {
+					"type": "string",
+					"default": "_tgiDrv",
+					"description": "TGI driver symbol name for static linking"
 				},
 				"cc65.cl65.options": {
 					"type": "string",
