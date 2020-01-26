@@ -58,3 +58,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.15] - 2020-01-26
 
 - fix default label to match tgi header
+
+## [0.0.16] - 2020-01-26
+
+- fix library link dir

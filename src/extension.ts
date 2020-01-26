@@ -663,7 +663,7 @@ function buildProgramCL65() {
                             " " + (ld65LinkOptions) +
                             " -o " + progPath +
                             " " + allObjectFiles +
-                            " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
+                            " " + cc65Path + fileseparator + "lib" + fileseparator + target + ".lib"
                         );                        
                     });
 
