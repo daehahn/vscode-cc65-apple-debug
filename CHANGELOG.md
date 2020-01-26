@@ -38,3 +38,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.10] - 2020-01-22
 
 - fix output file names of label and debug files
+
+## [0.0.11] - 2020-01-25
+
+- change to long form version of command line arguments for self-documentation of batch command
+
+## [0.0.12] - 2020-01-25
+
+- add linker options back in

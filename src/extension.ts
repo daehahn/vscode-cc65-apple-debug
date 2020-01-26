@@ -187,6 +187,10 @@ function getCC65CreateDebugInfo(outChannel?: vscode.OutputChannel): boolean {
     return getOneBooleanConfig('createDebugInfo', true, outChannel || undefined);
 }
 
+function getLD65Options(outChannel?: vscode.OutputChannel): string {
+    return getOneConfig('cl65.options', "", outChannel || undefined);
+}
+
 function getCC65Target(outChannel?: vscode.OutputChannel): string {
     return getOneConfig('cl65.target', "atarixl", outChannel || undefined);
 }
@@ -248,6 +252,7 @@ function dumpConfig(outChannel: vscode.OutputChannel) {
     getCC65Config(outChannel);
     getCC65Options(outChannel);
     getCC65CreateDebugInfo(outChannel);
+    getLD65Options(outChannel);
     getCC65Target(outChannel);
     getCC65Extension(outChannel);
     getCC65BuildOutput(outChannel);
@@ -342,6 +347,7 @@ function buildProgramCL65() {
     let cc65Path: string = getCC65Path();
     let config: string = getCC65Config();
     let cc65Options: string = getCC65Options();
+    let ld65LinkOptions: string = getLD65Options();
     let target: string = getCC65Target();
     let targetExtension: string = getCC65Extension();
     let buildenv: string = getCC65BuildEnv();
@@ -484,9 +490,9 @@ function buildProgramCL65() {
 
                     fs.appendFileSync(filename,
                         cc65Path + fileseparator + "cc65" + toolExtension +
-                        " -verbose" +
-                        (createDebugInfo ? " -g " : "") +
-                        " -t " + target +
+                        " --verbose" +
+                        (createDebugInfo ? " --debug-info " : "") +
+                        " --target " + target +
                         " " + cc65Options +
                         " " + oneFile +
                         " -o " + compilerResultFile +
@@ -494,9 +500,9 @@ function buildProgramCL65() {
 
                     fs.appendFileSync(filename,
                         cc65Path + fileseparator + "ca65" + toolExtension +
-                        " -verbose" +
-                        (createDebugInfo ? " -g " : "") +
-                        " -t " + target +
+                        " --verbose" +
+                        (createDebugInfo ? " --debug-info " : "") +
+                        " --target " + target +
                         " " + compilerResultFile +
                         " -o " + assembler65ResultFile +
                         //" " + oneFile.replace(".c",".s") + 
@@ -529,9 +535,9 @@ function buildProgramCL65() {
 
                             fs.appendFileSync(filename,
                                 cc65Path + fileseparator + "ca65" + toolExtension +
-                                " -verbose" +
-                                (createDebugInfo ? " -g " : "") +
-                                " -t " + target +
+                                " --verbose" +
+                                (createDebugInfo ? " --debug-info " : "") +
+                                " --target " + target +
                                 " " + oneFile +
                                 " -o " + assembler65ResultFile +
                                 "\n", "utf8");
@@ -565,6 +571,7 @@ function buildProgramCL65() {
                             (config ? " -C " + config : " -t " + target) +
                             (createDebugInfo ? " -Ln " + labelPath : "") +
                             (createDebugInfo ? " --dbgfile " + debugFilepath : "") +
+                            " " + (ld65LinkOptions) +
                             " -o " + progPath +
                             " " + allObjectFiles +
                             " " + cc65Path + fileseparator + ".." + fileseparator + "lib" + fileseparator + target + ".lib"
