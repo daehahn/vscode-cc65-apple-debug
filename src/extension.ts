@@ -524,7 +524,7 @@ function buildProgramCL65() {
         tgiDriverAssemblerFile = buildDir + fileseparator + tgiDriverFileName + ".s";
         // add the command to make the driver static image
         fs.appendFileSync(filename, 
-            cc65Path_target + fileseparator + "co65" + toolExtension +
+            cc65Path_bin + fileseparator + "co65" + toolExtension +
             " --code-label " + tgiLabel + 
             " " + tgiDriverPath +
             " -o " + tgiDriverAssemblerFile +
