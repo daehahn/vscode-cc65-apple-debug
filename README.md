@@ -4,7 +4,7 @@ This Visual Studio Code extension allows you to interact with CC65 for 6502/6581
 It is a resurrection of the original cc65 extension which was removed from github.
 
 The original extension is still available on the marketplace
-https://marketplace.visualstudio.com/items?itemName=SharpNinja.cc65
+<https://marketplace.visualstudio.com/items?itemName=SharpNinja.cc65>
 
 ## Features
 
