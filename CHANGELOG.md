@@ -66,3 +66,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.17] - 2020-01-26
 
 - change default config to atarixl-xex for C programs
+
+## [0.0.18] - 2020-01-26
+
+- add back .c files as activation pattern
