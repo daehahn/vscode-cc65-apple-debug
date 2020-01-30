@@ -26,6 +26,8 @@ Some features are not completed yet.
 
 You need to have CC65 already installed on your machine.
 
+On Windows, it uses powershell to execute the batch files for processing.
+
 You will want to have an emulator installed.
 
 ## Extension Settings
