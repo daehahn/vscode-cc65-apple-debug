@@ -1,17 +1,26 @@
 # cc65-redux Plugin For Compiling and Linking  C & Assembly
 
 This Visual Studio Code extension allows you to interact with CC65 for 6502/65816 machines.
-It is a resurrection of the original cc65 extension which was removed from github
+It is a resurrection of the original cc65 extension which was removed from github.
+
+The original extension is still available on the marketplace
+https://marketplace.visualstudio.com/items?itemName=SharpNinja.cc65
 
 ## Features
 
 The extension offers syntax highlighting and some commands to build an executable program from the assembler source code.
 
+Output files are put into the build/ directory in the workspace.
+
+Some features are not completed yet.
+
 * "CC65: Build Directly" will compile the files under the src folder of the workspace.
+* "CC65: Clean the build directory" deletes all files in the build/ directory.
 * "CC65: Build with Make" will execute Make in the workspace root.
-* "CC65: Run Emulator Directly" will run the currently compiled app in the root of the workspace.
-* "CC65: Run with Make" will execute Make using the "test" target.
-* "CC65: Run" will launch the emulator
+* "CC65: Build with Make & Run Emulator" will make and launch the emulator of the built target
+* "CC65: Build Directly & Run Emulator" will build directly and launch the emulator
+* "CC65: Run Program in Emulator" will run the currently compiled app in the root of the workspace in the emulator.
+* "CC65: Launch the Emulator" launches the emulator.
 
 ## Requirements
 
