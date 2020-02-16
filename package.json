@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.18",
+	"version": "0.0.19",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -144,13 +144,13 @@
 				},
 				"cc65.cl65.config": {
 					"type": "string",
-					"default": "C:\\cc65\\cfg\\atarixl-xex.cfg",
+					"default": "C:\\cc65\\cfg\\atari-xex.cfg",
 					"description": "Config file to use for ld65, such as 'cc65/cfg/atari.cfg'"
 				},
 				"cc65.cl65.tgi.driver": {
 					"type": "string",
 					"default": "",
-					"description": "TGI driver file to link statically, such as 'atarixl/drv/tgi/atr15p2.tgi'"
+					"description": "TGI driver file to link statically, such as 'atari/drv/tgi/atr15p2.tgi'"
 				},
 				"cc65.cl65.tgi.label": {
 					"type": "string",
@@ -164,7 +164,7 @@
 				},
 				"cc65.cl65.target": {
 					"type": "string",
-					"default": "atarixl-xex",
+					"default": "atari",
 					"enum": [
 						"none",
 						"apple2",

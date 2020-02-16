@@ -176,7 +176,7 @@ function getCC65Path(outChannel?: vscode.OutputChannel): string {
 }
 
 function getCC65Config(outChannel?: vscode.OutputChannel): string {
-    return getOneConfig('cl65.config', "C:\\cc65\\cfg\\atarixl-xex.cfg", outChannel || undefined);
+    return getOneConfig('cl65.config', "C:\\cc65\\cfg\\atari-xex.cfg", outChannel || undefined);
 }
 
 function getCC65Options(outChannel?: vscode.OutputChannel): string {
@@ -192,7 +192,7 @@ function getLD65Options(outChannel?: vscode.OutputChannel): string {
 }
 
 function getCC65Target(outChannel?: vscode.OutputChannel): string {
-    return getOneConfig('cl65.target', "atarixl", outChannel || undefined);
+    return getOneConfig('cl65.target', "atari", outChannel || undefined);
 }
 
 function getCC65tgiDriver(outChannel?: vscode.OutputChannel): string {

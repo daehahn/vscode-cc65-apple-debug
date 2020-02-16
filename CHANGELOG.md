@@ -70,3 +70,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.18] - 2020-01-26
 
 - add back .c files as activation pattern
+
+## [0.0.19] - 2020-02-15
+
+- change to atari as default target instead of atarixl
