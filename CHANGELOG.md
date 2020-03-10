@@ -74,3 +74,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.19] - 2020-02-15
 
 - change to atari as default target instead of atarixl
+
+## [0.0.20] - 2020-03-10
+
+- add .h to activation extension
