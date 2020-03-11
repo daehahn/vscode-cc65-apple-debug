@@ -19,25 +19,25 @@ export function activate(context: vscode.ExtensionContext): void {
     console.log('Congratulations, your extension "cc65-redux" is now active!');
 }
 
-//declare function buildProgramCL65(void): number;
-//declare function buildProgramMake(void): number;
-//declare function runProgram(void): void;
-
 function buildCommands(context: vscode.ExtensionContext): void {
 
-    const cmdStrBuild = 'cc65.build';
+    const cmdStrScriptBuild = 'cc65.script.build';
+    const cmdScriptBuildCreate = 'cc65.script.build.create';
     const cmdStrRun = 'cc65.run.program';
     const cmdStrRunEmu = 'cc65.run.emulator';
-    const cmdStrBuildRun = 'cc65.build_run';
     const cmdStrClean = 'cc65.clean';
     const cmdStrMakeBuild = 'cc65.make.build';
-    const cmdStrMakeBuildRun = 'cc65.make.build_run';
     const cmdStrTest = 'cc65.test';
 
-    //  define direct build & run commands
-    let commandBuild = vscode.commands.registerCommand(cmdStrBuild, function () {
+    let commandScriptBuild = vscode.commands.registerCommand(cmdStrScriptBuild, function () {
 
-        buildProgramCL65();
+        scriptBuild();
+    });
+
+    //  define direct build & run commands
+    let commandScriptBuildCreate = vscode.commands.registerCommand(cmdScriptBuildCreate, function () {
+
+        scriptBuildCreate();
     });
 
     let commandRun = vscode.commands.registerCommand(cmdStrRun, function () {
@@ -50,17 +50,8 @@ function buildCommands(context: vscode.ExtensionContext): void {
         launchEmulator(false);
     });
 
-    let commandBuildRun = vscode.commands.registerCommand(cmdStrBuildRun, function () {
-
-        if (buildProgramCL65() === 0) {
-
-            runProgram();
-        }
-    });
-
-    // clean command
     let commandClean = vscode.commands.registerCommand(cmdStrClean, function () {
-
+        // clean command
         cleanBuildOutput();
     });
 
@@ -72,15 +63,6 @@ function buildCommands(context: vscode.ExtensionContext): void {
         buildProgramMake();
     });
 
-    //  define the build and run command
-    let commandBuildRunMake = vscode.commands.registerCommand(cmdStrMakeBuildRun, function () {
-
-        if (buildProgramMake() === 0) {
-
-            runProgram();
-        }
-    });
-
     // test command
 
     let commandTest = vscode.commands.registerCommand(cmdStrTest, function () {
@@ -89,14 +71,13 @@ function buildCommands(context: vscode.ExtensionContext): void {
     });
 
     // commands on status bar
-    context.subscriptions.push(commandBuild);
+    context.subscriptions.push(commandScriptBuildCreate);
+    context.subscriptions.push(commandScriptBuild);
     context.subscriptions.push(commandRun);
     context.subscriptions.push(commandRunEmu);
     context.subscriptions.push(commandClean);
     // regular commands
-    context.subscriptions.push(commandBuildRun);
     context.subscriptions.push(commandBuildMake);
-    context.subscriptions.push(commandBuildRunMake);
     context.subscriptions.push(commandTest);
 
     let textThemeColorKey: string = 'statusBarItem.prominentForeground';
@@ -104,7 +85,7 @@ function buildCommands(context: vscode.ExtensionContext): void {
     let textColor: vscode.ThemeColor = new vscode.ThemeColor(textThemeColorKey);
 
 	var sbiBuild: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    sbiBuild.command = cmdStrBuild;
+    sbiBuild.command = cmdScriptBuildCreate;
     sbiBuild.color = textColor;
     sbiBuild.text = '$(zap) Build';
     sbiBuild.tooltip = 'CC65 Build Workspace';
@@ -342,9 +323,167 @@ function cleanBuildOutput() {
     return errorCode;
 }
 
+function scriptBuild() {
+
+    let errorCode = 0;
+
+    // Check path settings
+    let outputChannel = vscode.window.createOutputChannel('cc65');
+    outputChannel.clear();
+    outputChannel.show();
+    dumpConfig(outputChannel);
+
+    let cc65Path: string = getCC65Path();
+    let buildenv: string = getCC65BuildEnv();
+    let vscodeenv: string = getCC65VSCodeEnv();
+    let buildDir: string = getCC65BuildOutput();
+
+    if (cc65Path === "") {
+        vscode.window.showErrorMessage('Set cc65 in User Settings.');
+        errorCode = -1;
+        return errorCode;
+    }
+
+    if (!fs.existsSync(cc65Path)) {
+        vscode.window.showErrorMessage('cc65 path not found. Check User Settings.');
+        errorCode = -2;
+        return errorCode;
+    }
+
+    let toolExtension: string = "";
+    let fileseparator: string = "/";
+    let altRootPath: string = vscode.workspace.workspaceFolders![0].uri.fsPath.trim();
+    let rootpath: string = vscode.workspace.rootPath!.trim();
+
+    if (altRootPath === rootpath) {
+        outputChannel.appendLine("The paths are the same");
+    }
+
+
+    if (buildenv === "linux") {
+        rootpath = rootpath.replace("c:", "/mnt/c");
+        rootpath = rootpath.replace("d:", "/mnt/d");
+        rootpath = rootpath.replace("e:", "/mnt/e");
+        rootpath = rootpath.replace("f:", "/mnt/f");
+        rootpath = rootpath.replace("g:", "/mnt/g");
+        rootpath = rootpath.replace("h:", "/mnt/h");
+        rootpath = rootpath.replace("i:", "/mnt/i");
+        rootpath = rootpath.replace("j:", "/mnt/j");
+
+        while (rootpath.indexOf("\\") > -1) {
+            rootpath = rootpath.replace("\\", "/");
+        }
+    } else {
+        fileseparator = "\\";
+        toolExtension = ".exe";
+    }
+
+    let command = "powershell.exe";
+
+    if (buildenv === "linux" && vscodeenv === "linux") {
+        command = "bash";
+    } else if (buildenv === "linux" && vscodeenv === "windows") {
+        command = "powershell.exe";
+    } else if (buildenv === "windows" && vscodeenv === "windows") {
+        command = "powershell.exe";
+    } else {
+        vscode.window.showErrorMessage('cc65 build env misconfigured. Check User Settings.');
+        errorCode = -3;
+        return errorCode;
+    }
+
+    // temp - only support windows/windows
+    if (buildenv !== "windows" || vscodeenv !== "windows") {
+        vscode.window.showErrorMessage('cc65 Only windows for buildenv and vscodeenv is supported right now. Check User Settings.');
+        errorCode = -4;
+        return errorCode;
+    }
+    
+    outputChannel.append("Building using buildenv: ");
+    outputChannel.append(buildenv);
+    outputChannel.append(" vscodenv: ");
+    outputChannel.append(vscodeenv);
+    outputChannel.appendLine("...");
+
+    let parameters: string[] = [];    
+    if (command === "powershell.exe") {
+        parameters = [
+            "\"",
+            "./cc65_plugin_build.bat\""
+        ];
+    } else {
+        parameters = [
+            "-c",
+            "./cc65_plugin_build.sh"
+        ];
+    }
+
+    // make sure the build dir is there
+    let outputBuildDir: string = rootpath + fileseparator + buildDir;
+    if (!fs.existsSync(outputBuildDir)) {
+        fs.mkdirSync(outputBuildDir);
+    }
+
+    outputChannel.appendLine("Running build script...");
+    outputChannel.append(command);
+    outputChannel.append(" ");
+    outputChannel.append(parameters.join(" "));
+    outputChannel.appendLine("...");
+
+    // this runs the command
+    let ca = cp.spawn(command, parameters, {
+        detached: false,
+        shell: true,
+        cwd: vscode.workspace.rootPath!.trim()
+    });
+
+    ca.on("close", (e) => {
+        outputChannel.appendLine('Child process exit code: ' + e);
+        errorCode = e;
+        // add config for this
+        if (errorCode !== 0) {
+            vscode.window.showErrorMessage('Compilation failed with errors.');
+        }
+    });
+
+    ca.stdout.on('data', function (data) {
+        outputChannel.append('' + data);
+    });
+
+    ca.stderr.on('data', function (data) {
+        outputChannel.append('' + data);
+    });
+
+    outputChannel.appendLine("... finished.");
+
+    return errorCode;
+
+}
+
+function chooseToOverwrite(): boolean {
+
+    let qpOptions:vscode.QuickPickOptions = {
+        canPickMany: false,
+        ignoreFocusOut: true,
+        placeHolder: 'Build script already exists. Overwrite?'
+    };
+
+    let choices: string[] = ['overwrite', 'cancel'];
+
+    let overwrite: boolean = false;
+
+    vscode.window.showQuickPick(choices, qpOptions).then(
+        (result) => {     if (result === 'overwrite') {
+            overwrite = true;
+        } 
+    }
+    );
+
+    return overwrite;
+}
 
 // build the program
-function buildProgramCL65() {
+function scriptBuildCreate() {
 
     let errorCode = 0;
 
@@ -482,6 +621,21 @@ function buildProgramCL65() {
     outputChannel.appendLine("...");
 
     var filename = vscode.workspace.rootPath!.trim() + "/cc65_plugin_build" + scriptExt;
+
+    // if the file already exists, ask to overrite
+    if (!fs.existsSync(filename)) {
+
+        let overwrite: boolean = chooseToOverwrite();
+
+        if (!overwrite) {
+            outputChannel.appendLine("Aborting due to existing script file");
+            return 0;
+        }
+        
+        outputChannel.appendLine("Overwriting existing script file...");
+    }
+
+
     if (buildenv === "windows") {
         fs.writeFileSync(filename, ":: CC65 Batch file for building\n");
     }
@@ -668,37 +822,8 @@ function buildProgramCL65() {
                         );                        
                     });
 
-                outputChannel.appendLine("running command...");
-                outputChannel.append(command);
-                outputChannel.append(" ");
-                outputChannel.append(parameters.join(" "));
-                outputChannel.appendLine("...");
-
-                // this runs the command
-                let ca = cp.spawn(command, parameters, {
-                    detached: false,
-                    shell: true,
-                    cwd: vscode.workspace.rootPath!.trim()
-                });
-
-                ca.on("close", (e) => {
-                    outputChannel.appendLine('Child process exit code: ' + e);
-                    errorCode = e;
-                    // add config for this
-                    if (errorCode !== 0) {
-                        vscode.window.showErrorMessage('Compilation failed with errors.');
-                    }
-                });
-
-                ca.stdout.on('data', function (data) {
-                    outputChannel.append('' + data);
-                });
-
-                ca.stderr.on('data', function (data) {
-                    outputChannel.append('' + data);
-                });
-
-                outputChannel.appendLine("... finished.");
+                outputChannel.appendLine("Build Script created: ");
+                outputChannel.appendLine(filename);
             });
 
     return errorCode;

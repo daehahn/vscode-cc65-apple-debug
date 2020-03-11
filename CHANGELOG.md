@@ -78,3 +78,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.20] - 2020-03-10
 
 - add .h to activation extension
+
+## [0.0.21] - 2020-03-10
+
+- split apart build script creation from script build
+- remove 'build and run' commands

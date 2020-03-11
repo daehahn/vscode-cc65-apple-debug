@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -30,27 +30,15 @@
 	"contributes": {
 		"keybindings": [
 			{
-				"command": "cc65.build",
+				"command": "cc65.script.build ",
 				"key": "ctrl-b",
 				"mac": "cmd-b",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "cc65.build_run",
-				"key": "ctrl-e",
-				"mac": "cmd-e",
 				"when": "editorTextFocus"
 			},
 			{
 				"command": "cc65.make.build",
 				"key": "ctrl-m",
 				"mac": "cmd-m",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "cc65.make.build_run",
-				"key": "ctrl-t",
-				"mac": "cmd-t",
 				"when": "editorTextFocus"
 			},
 			{
@@ -88,8 +76,12 @@
 				"title": "CC65: Test"
 			},
 			{
-				"command": "cc65.build",
-				"title": "CC65: Build Directly"
+				"command": "cc65.script.build",
+				"title": "CC65: Build using script file from analyze/manual step"
+			},
+			{
+				"command": "cc65.script.build.create",
+				"title": "CC65: Create a build script based on sources in the ./src directory of the workspace"
 			},
 			{
 				"command": "cc65.clean",
@@ -98,14 +90,6 @@
 			{
 				"command": "cc65.make.build",
 				"title": "CC65: Build with Make"
-			},
-			{
-				"command": "cc65.make.build_run",
-				"title": "CC65: Build with Make & Run Emulator"
-			},
-			{
-				"command": "cc65.build_run",
-				"title": "CC65: Build Directly & Run Emulator"
 			},
 			{
 				"command": "cc65.run.program",
