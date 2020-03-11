@@ -2,7 +2,7 @@
 	"name": "cc65-redux",
 	"displayName": "cc65-redux",
 	"description": "CC65 cross compiler for 6502/6518 - based on cc65",
-	"version": "0.0.21",
+	"version": "0.0.22",
 	"publisher": "rumination-studios",
 	"markdown": "github",
 	"engines": {
@@ -30,7 +30,7 @@
 	"contributes": {
 		"keybindings": [
 			{
-				"command": "cc65.script.build ",
+				"command": "cc65.script.build",
 				"key": "ctrl-b",
 				"mac": "cmd-b",
 				"when": "editorTextFocus"

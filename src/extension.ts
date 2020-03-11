@@ -85,7 +85,7 @@ function buildCommands(context: vscode.ExtensionContext): void {
     let textColor: vscode.ThemeColor = new vscode.ThemeColor(textThemeColorKey);
 
 	var sbiBuild: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    sbiBuild.command = cmdScriptBuildCreate;
+    sbiBuild.command = cmdStrScriptBuild;
     sbiBuild.color = textColor;
     sbiBuild.text = '$(zap) Build';
     sbiBuild.tooltip = 'CC65 Build Workspace';
@@ -379,6 +379,7 @@ function scriptBuild() {
     }
 
     let command = "powershell.exe";
+    let scriptExt = '.sh';
 
     if (buildenv === "linux" && vscodeenv === "linux") {
         command = "bash";
@@ -398,7 +399,27 @@ function scriptBuild() {
         errorCode = -4;
         return errorCode;
     }
-    
+
+    let buildingOnWindows: Boolean = false;
+    if (buildenv === "windows") {
+        buildingOnWindows = true;
+        scriptExt = ".bat";
+    }
+
+    // fix up this string literal
+    let filename:string = vscode.workspace.rootPath!.trim() + "/cc65_plugin_build" + scriptExt;
+
+    // if the file is not there, we can't do anythhing
+    if (!fs.existsSync(filename)) {
+
+        outputChannel.append("Build script file: ");
+        outputChannel.appendLine(filename);
+        outputChannel.appendLine("Does not exist, build aborted.");
+        // exit early with error
+        errorCode = -5;
+        return errorCode;
+    }    
+
     outputChannel.append("Building using buildenv: ");
     outputChannel.append(buildenv);
     outputChannel.append(" vscodenv: ");
@@ -429,7 +450,7 @@ function scriptBuild() {
     outputChannel.append(" ");
     outputChannel.append(parameters.join(" "));
     outputChannel.appendLine("...");
-
+    
     // this runs the command
     let ca = cp.spawn(command, parameters, {
         detached: false,
@@ -460,7 +481,7 @@ function scriptBuild() {
 
 }
 
-function chooseToOverwrite(): boolean {
+async function chooseToOverwrite() {
 
     let qpOptions:vscode.QuickPickOptions = {
         canPickMany: false,
@@ -470,20 +491,12 @@ function chooseToOverwrite(): boolean {
 
     let choices: string[] = ['overwrite', 'cancel'];
 
-    let overwrite: boolean = false;
-
-    vscode.window.showQuickPick(choices, qpOptions).then(
-        (result) => {     if (result === 'overwrite') {
-            overwrite = true;
-        } 
-    }
-    );
-
-    return overwrite;
+    let chosenValue = await vscode.window.showQuickPick(choices, qpOptions);
+    return chosenValue;
 }
 
 // build the program
-function scriptBuildCreate() {
+async function scriptBuildCreate() {
 
     let errorCode = 0;
 
@@ -623,11 +636,11 @@ function scriptBuildCreate() {
     var filename = vscode.workspace.rootPath!.trim() + "/cc65_plugin_build" + scriptExt;
 
     // if the file already exists, ask to overrite
-    if (!fs.existsSync(filename)) {
+    if (fs.existsSync(filename)) {
 
-        let overwrite: boolean = chooseToOverwrite();
-
-        if (!overwrite) {
+        let selectedString = await chooseToOverwrite();
+        
+        if (selectedString !== 'overwrite') {
             outputChannel.appendLine("Aborting due to existing script file");
             return 0;
         }
@@ -809,7 +822,7 @@ function scriptBuildCreate() {
                         let labelPath: string = prefixpath + buildDir + fileseparator + programName + ".lbl";
                         let debugFilepath: string = prefixpath + buildDir + fileseparator + programName + ".dbg";
 
-                        outputChannel.append('' + config);
+                        //outputChannel.append('' + config);
                         fs.appendFileSync(filename,
                             cc65Path_bin + fileseparator + "ld65" + toolExtension +
                             (config ? " -C " + config : " -t " + target) +
@@ -901,7 +914,6 @@ function buildProgramMake() {
 }
 
 function launchEmulator(launchProgram: boolean) {
-
 
     let emulatorOptions = getCC65EmulatorOptions();
     let testenv = getCC65TestEnv();

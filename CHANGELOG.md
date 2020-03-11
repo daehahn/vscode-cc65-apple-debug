@@ -83,3 +83,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - split apart build script creation from script build
 - remove 'build and run' commands
+
+## [0.0.22] - 2020-03-10
+
+- bugfixes after splitting apart script creation
+- add async processing for creating build script in order to handle ShowQuickPick() correctly
